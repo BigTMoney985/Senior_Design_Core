@@ -1,4 +1,7 @@
-import openmc
+try:
+    import openmc # type: ignore
+except ImportError:
+    raise ImportError("The openmc module is required but not installed.")
 
 
 def create_materials(mat_choice: str):
