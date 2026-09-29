@@ -125,21 +125,23 @@ def create_materials(mat_choice: str):
     else:
         raise ValueError(f"Invalid material choice: {mat_choice}. Valid choices are: 'u3si2', 'u3o8', 'u10mo'")
 
-    materials = openmc.Materials([
-                aluminum, 
-                 ss_304, 
-                 ss_304L, 
-                 concrete, 
-                 air, 
-                 be_metal, 
-                 graphite, 
-                 boron, 
-                 borated_ss306, 
-                 fuel, 
-                 zr_barrier,
-                 ])
+    materials_dict = {
+        'aluminum': aluminum,
+        'ss_304': ss_304,
+        'ss_304L': ss_304L,
+        'concrete': concrete,
+        'air': air,
+        'be_metal': be_metal,
+        'graphite': graphite,
+        'boron': boron,
+        'borated_ss306': borated_ss306,
+        'fuel': fuel,
+        'zr_barrier': zr_barrier,
+    }
+
+    materials = openmc.Materials(list(materials_dict.values()))
     materials.export_to_xml()
-    return materials
+    return materials_dict
 
 
 def u_gcc(fuel):
