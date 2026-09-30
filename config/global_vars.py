@@ -3,6 +3,11 @@ config/global_vars.py
 Central registry for global dimensions, material conditions, 
 and shared surface primitives.
 """
+
+def in_to_cm(inches: float) -> float:
+    """Convert inches to centimeters."""
+    return inches * 2.54
+
 from dataclasses import dataclass
 
 @dataclass
@@ -13,6 +18,11 @@ class fluxtrap:
 @dataclass
 class fuel:
     temp_var: float = 1.0
+    meat_thickness: float = 0.13
+    clad_thickness: float = in_to_cm(0.015)
+    nominal_dist: float = 0.15
+
+
 
 @dataclass
 class vessel:
