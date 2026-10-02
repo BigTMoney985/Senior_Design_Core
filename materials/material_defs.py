@@ -136,6 +136,7 @@ def create_materials(mat_choice: str):
         'boron': boron,
         'borated_ss306': borated_ss306,
         'fuel': fuel,
+        'water': water,
         'zr_barrier': zr_barrier,
     }
 

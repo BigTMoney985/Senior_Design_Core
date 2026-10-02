@@ -1,6 +1,8 @@
 import openmc 
 import numpy as np
 from config.global_vars import fuel, fluxtrap
+import materials
+from materials.material_defs import create_materials
 
 element_left_bound = openmc.YPlane(y0=0) #left bound of full element
 fuel_left = openmc.YPlane(y0=fuel.clad_thickness) # left bound of the fuel region.
@@ -31,6 +33,8 @@ for i in range(fuel.plate_num):
 #surfaces[2] -> outer_meat_thickness
 #surfaces[3] -> outer_clad_thickness
 
+materials_dict = create_materials('u3si2')
+
 clad_cells = []
 fuel_cells = []
 water_cells = []
@@ -40,8 +44,8 @@ for i in range(fuel.plate_num):
         clad_left = +element_left_bound & -fuel_left & -outer_clad_thickness[-1] & inner_clad_surfaces[0]
         clad_right = +inner_clad_surfaces[0] & -outer_clad_thickness[-1] & -element_angle & +fuel_angle
 
-        clad_cells.append(openmc.Cell(region=clad_left))
-        clad_cells.append(openmc.Cell(region=clad_right))
+        clad_cells.append(openmc.Cell(region=clad_left, fill=materials_dict['aluminum']))
+        clad_cells.append(openmc.Cell(region=clad_right, fill=materials_dict['aluminum']))
 
     clad_inner_region = +inner_clad_surfaces[i] & -inner_meat_thickness[i] & -fuel_angle & +fuel_left
     meat_region = +inner_meat_thickness[i] & -outer_meat_thickness[i] & -fuel_angle & +fuel_left
@@ -50,12 +54,12 @@ for i in range(fuel.plate_num):
     if i != fuel.plate_num - 1:
         water_region = +outer_clad_thickness[i] & -inner_clad_surfaces[i+1] & -fuel_angle & +fuel_left
 
-    clad_cells.append(openmc.Cell(region=clad_inner_region))
-    fuel_cells.append(openmc.Cell(region=meat_region))
-    clad_cells.append(openmc.Cell(region=clad_outer_region))
+    clad_cells.append(openmc.Cell(region=clad_inner_region, fill=materials_dict['aluminum']))
+    fuel_cells.append(openmc.Cell(region=meat_region, fill=materials_dict['fuel']))
+    clad_cells.append(openmc.Cell(region=clad_outer_region, fill=materials_dict['aluminum']))
     if i != fuel.plate_num - 1:
-        water_cells.append(openmc.Cell(region=water_region))
-        
+        water_cells.append(openmc.Cell(region=water_region, fill=materials_dict['water']))
+
 
     
 
