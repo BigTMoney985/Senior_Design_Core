@@ -31,7 +31,6 @@ def create_materials(mat_choice: str):
     aluminum.add_element('Ti', 0.0005, 'wo')
     aluminum.add_element('Cr', 0.002, 'wo')
     aluminum.set_density('g/cm3', 2.7)
-    aluminum.add_s_alpha_beta('c_Al27')
 
     # Stainless Steel 304
     ss_304 = openmc.Material(name='SS-304')
@@ -105,6 +104,7 @@ def create_materials(mat_choice: str):
 
         fuel = openmc.Material.mix_materials([u3si2, aluminum], fracs=[0.52, 0.48], percent_type='wo')
         fuel.set_density('g/cm3', 11.8)
+        fuel.add_s_alpha_beta('c_Al27')
 
     elif mat_choice.lower() == 'u3o8':
         # U3O8
@@ -124,6 +124,9 @@ def create_materials(mat_choice: str):
         fuel = u10mo
     else:
         raise ValueError(f"Invalid material choice: {mat_choice}. Valid choices are: 'u3si2', 'u3o8', 'u10mo'")
+
+    aluminum.add_s_alpha_beta('c_Al27')
+    # This has to be put here otherwise it does not work.
 
     materials_dict = {
         'aluminum': aluminum,

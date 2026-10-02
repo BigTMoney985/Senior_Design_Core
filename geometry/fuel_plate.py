@@ -5,7 +5,7 @@ import materials
 from materials.material_defs import create_materials
 
 class FuelPlateGeometry:
-    def __init__(self, fuel, fuel_choice):
+    def __init__(self, fuel_choice):
         self.fuel_choice = fuel_choice
         self.element_left_bound = openmc.YPlane(y0=0) #left bound of full element
         self.fuel_left = openmc.YPlane(y0=fuel.clad_thickness) # left bound of the fuel region.
@@ -51,7 +51,7 @@ class FuelPlateGeometry:
         inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness = self.define_plates()
         # Creating surfaces to actually work with
 
-        materials_dict = create_materials('u3si2')
+        materials_dict = create_materials(self.fuel_choice)
         # Creating materials dictionary for the fuel, cladding, and water cells
 
         clad_cells = []
@@ -79,6 +79,8 @@ class FuelPlateGeometry:
             clad_cells.append(openmc.Cell(region=clad_outer_region, fill=materials_dict['aluminum']))
             if i != fuel.plate_num - 1:
                 water_cells.append(openmc.Cell(region=water_region, fill=materials_dict['water']))
+
+        return clad_cells, fuel_cells, water_cells
 
 
 
