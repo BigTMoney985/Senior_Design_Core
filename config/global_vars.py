@@ -21,6 +21,9 @@ class fuel:
     meat_thickness: float = 0.13
     clad_thickness: float = in_to_cm(0.015)
     nominal_dist: float = 0.15
+    fuel_inner: float = 8
+    plate_num: int = 30
+    fuel_outer: float = (meat_thickness + 2 * clad_thickness + nominal_dist) * plate_num - nominal_dist
 
 
 
