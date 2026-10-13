@@ -1,24 +1,15 @@
 # THIS WILL CONTAIN RUN MODES AND WHATNOT
 import openmc
-from geometry.fuel_plate import FuelPlateGeometry
+from geometry.fuel_plate import create_fuel_geometry
 from matplotlib import pyplot as plt
 from config import global_vars as gv
 
+
+
 # INITIALIZATION OF FUEL TYPE
-
-plateclass = FuelPlateGeometry('u3si2')
-
-cells = plateclass.create_plate_cells()
-
-element_universe = openmc.Universe(cells=cells)
-
-geom = openmc.Geometry(element_universe)
-
-print(element_universe)
-
-
-
+geom = create_fuel_geometry()
 geom.export_to_xml()
+
 
 plot = openmc.Plot()
 plot.basis = 'xy'
