@@ -1,15 +1,28 @@
 import openmc 
-import numpy as np
 import config.global_vars as gv
-from materials.material_defs import create_materials
-from geometry.fuel_element import FuelElementGeometry
 from geometry.fuel_ring import FuelRingGeometry
+from geometry.surrounding_water import WaterGeometry
 
+def create_geometry():
+    fuel_ring_geometry = FuelRingGeometry()
+    water_geom = WaterGeometry()
 
-# INITIALIZATION OF FUEL TYPE
-material_dict = create_materials(gv.user_opts.fuel_choice)
-fuel_geometry = FuelElementGeometry() # Create one fuel element
-fuel_ring_geometry = FuelRingGeometry() # Create inner ring
+    # Create shared boundary cylinders
+    inner_cyl, outer_cyl, graveyard = water_geom.create_surfaces()
 
+    # 1. Water cells (central cavity + outer reflector)
+    water_cells = water_geom.create_water_cells(inner_cyl, outer_cyl, graveyard)
 
-ring_univ = fuel_ring_geometry.create_fuel_ring()  # Create the fuel ring geometry
+    # 2. Fuel ring cell (bounded strictly to the annular space)
+    ring_cell = openmc.Cell(
+        name="fuel_ring_annulus",
+        fill=fuel_ring_geometry.create_fuel_ring(),
+        region=+inner_cyl & -outer_cyl
+    )
+
+    # 3. Assemble root universe
+    root_universe = openmc.Universe(cells=water_cells + [ring_cell])
+    root_geometry = openmc.Geometry(root=root_universe)
+    root_geometry.export_to_xml()
+
+    return root_geometry

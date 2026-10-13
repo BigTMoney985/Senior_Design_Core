@@ -4,23 +4,16 @@ from geometry.fuel_element import FuelElementGeometry
 from matplotlib import pyplot as plt
 from config import global_vars as gv
 from materials.material_defs import create_materials
-from geometry.fuel_ring import FuelRingGeometry
+# from geometry.fuel_ring import FuelRingGeometry
+from geometry.model import create_geometry
 
-
-
-# INITIALIZATION OF FUEL TYPE
 material_dict = create_materials(gv.user_opts.fuel_choice)
-fuel_geometry = FuelElementGeometry()
-fuel_ring_geometry = FuelRingGeometry()
-geom = fuel_ring_geometry.create_fuel_ring_geometry()  # Create the fuel ring geometry
-geom.export_to_xml()
-
-universe = gv.element_ring_class.universe  # Get the universe from the global variable
+geom = create_geometry()
 
 # PLOTTING THE FUEL ELEMENT GEOMETRY
 plot = openmc.Plot()
-plot.show_overlaps = True
-plot.overlap_color = 'orange'
+#plot.show_overlaps = True
+#plot.overlap_color = 'orange'
 plot.basis = 'xy'
 plot.origin = (0, 0, 10)
 plot.width = (40, 40)

@@ -1,20 +1,36 @@
 import openmc 
 import config.global_vars as gv
-from materials.material_defs import create_materials
-from geometry.fuel_element import FuelElementGeometry
-from geometry.fuel_ring import FuelRingGeometry
 
 class WaterGeometry:
     def __init__(self) -> None:
-        self.water_central = gv.fuel.fuel_inner
-        self.water_outer = gv.fuel.fuel_outer
+        self.r_central = gv.fuel.fuel_inner
+        self.r_outer = gv.fuel.fuel_outer
         self.water_mat = gv.materials.material_dict['water'] # type: ignore
-        pass
+        self.graveyard_r = gv.user_opts.graveyard
 
-    def central_water(self):
+    def create_surfaces(self):
+        """Surfaces shared across water and fuel boundaries."""
+        inner_cyl = openmc.ZCylinder(r=self.r_central)
+        outer_cyl = openmc.ZCylinder(r=self.r_outer)
+        graveyard = openmc.ZCylinder(r=self.graveyard_r, boundary_type='vacuum')
+        return inner_cyl, outer_cyl, graveyard
 
-        central_water_reg = openmc.ZCylinder(r=self.water_central)
-        central_water_cell = openmc.Cell(fill=self.water_mat, region=-central_water_reg)
+    def create_water_cells(self, inner_cyl, outer_cyl, graveyard):
+        # 1. Flux trap / central cavity
+        central_cell = openmc.Cell(
+            name="central_water",
+            fill=self.water_mat,
+            region=-inner_cyl
+        )
+
+        # 2. Outside water reflector up to the graveyard boundary
+        outer_cell = openmc.Cell(
+            name="outer_water",
+            fill=self.water_mat,
+            region=+outer_cyl & -graveyard
+        )
+
+        return [central_cell, outer_cell]
         
 
 

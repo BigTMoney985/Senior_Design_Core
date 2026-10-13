@@ -14,6 +14,7 @@ def in_to_cm(inches: float) -> float:
 class user_opts_class:
     run_mode: str = 'plot'  # Default run mode is 'plot'
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
+    graveyard: float = 120
 user_opts = user_opts_class()
 
 @dataclass
@@ -30,7 +31,7 @@ class fuel_class:
     nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
     fuel_inner: float = 8 # Inner radius of the fuel element
     plate_num: int = 30 #number of fuel plates in the fuel element
-    fuel_outer: float = (meat_thickness + 2 * clad_thickness + nominal_dist) * plate_num - nominal_dist
+    fuel_outer: float = 20 # placeholder value
 fuel = fuel_class()
 
 @dataclass

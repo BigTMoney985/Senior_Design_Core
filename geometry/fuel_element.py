@@ -49,6 +49,7 @@ class FuelElementGeometry:
 
             if i == fuel.plate_num - 1:
                 self.outer_thickness = _outer_clad_thickness
+                fuel.fuel_outer = self.outer_thickness
                 self.inner_thickness = inner_clad_surfaces[0].r
 
 
