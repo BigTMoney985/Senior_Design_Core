@@ -1,6 +1,6 @@
 import openmc 
 import numpy as np
-from config.global_vars import fuel, user_opts, materials
+from config.global_vars import fuel, user_opts, materials, element_cell_class
 from materials.material_defs import create_materials
 
 
@@ -117,6 +117,13 @@ class FuelElementGeometry:
         element_bound_out = openmc.ZCylinder(r=fuel.fuel_outer)
         element_bound_in = openmc.ZCylinder(r=fuel.fuel_inner)
         element_region = +element_bound_in & -element_bound_out & -self.fuel_angle & +self.element_left_bound
+
+        if self.fuel_universe is None:
+            self.create_fuel_universe()
+
+        # automatically adds some vars to the global_vars file for the fuel element universe and cell
+        element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) # type: ignore
+
 
         if self.fuel_universe is None:
             self.create_fuel_universe()
