@@ -1,6 +1,6 @@
 import openmc 
 import numpy as np
-from config.global_vars import fuel, fluxtrap
+from config.global_vars import fuel, fluxtrap, element_ring_class
 #from materials.material_defs import create_materials
 from geometry.fuel_element import FuelElementGeometry
 
@@ -22,7 +22,11 @@ class FuelRingGeometry:
 
             else:
                 # For subsequent elements, we need to rotate the base element
-                rotated_element = openmc.Cell(region=self.element_base.region, fill=self.element_base.fill)
+                rotated_element = openmc.Cell(
+                    #region=self.element_base.region, 
+                    fill=self.element_base.fill,
+                    )
+                
                 rotated_element.rotation = (0, 0, angle)  # Rotate around the z-axis
                 rotated_element.id = self.element_base.id + i  # Assign a unique ID to each rotated element
             self.ring_universe.add_cell(rotated_element)
@@ -31,7 +35,9 @@ class FuelRingGeometry:
 
     def create_fuel_ring_geometry(self) -> openmc.Geometry:
         ring_universe = self.create_fuel_ring()
-        ring_universe.id = 1000  # Assign a unique ID to the ring universe
+        #ring_universe.id = 1000  # Assign a unique ID to the ring universe
+        element_ring_class.set_universe(ring_universe)  # Store the ring universe in the global variable
+
         geom = openmc.Geometry(root=ring_universe)
         return geom
 

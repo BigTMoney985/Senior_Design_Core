@@ -15,6 +15,8 @@ fuel_ring_geometry = FuelRingGeometry()
 geom = fuel_ring_geometry.create_fuel_ring_geometry()  # Create the fuel ring geometry
 geom.export_to_xml()
 
+universe = gv.element_ring_class.universe  # Get the universe from the global variable
+
 # PLOTTING THE FUEL ELEMENT GEOMETRY
 plot = openmc.Plot()
 plot.basis = 'xy'

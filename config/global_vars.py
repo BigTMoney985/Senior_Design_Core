@@ -71,3 +71,18 @@ class _element_cell_class:
         """Clear the default cell."""
         self.default_cell = None
 element_cell_class = _element_cell_class()
+
+@dataclass
+class _element_ring_class:
+    universe: None | openmc.Universe = None
+
+    def set_universe(self, universe: openmc.Universe) -> None:
+        """Set the universe for the fuel element ring."""
+        if universe is None:
+            raise ValueError("Universe cannot be None. Please provide a valid openmc.Universe object.")
+        self.universe = universe
+
+    def clear_universe(self) -> None:
+        """Clear the universe."""
+        self.universe = None
+element_ring_class = _element_ring_class()
