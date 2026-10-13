@@ -11,12 +11,14 @@ def in_to_cm(inches: float) -> float:
 from dataclasses import dataclass
 
 @dataclass
-class fluxtrap:
+class fluxtrap_class:
     r_in: float = 4.0 # Inner radius of the flux trap
     # NOTE, this may need to be adjusted based on the specific flux trap design
 
+fluxtrap = fluxtrap_class()
+
 @dataclass
-class fuel:
+class fuel_class:
     temp_var: float = 1.0
     meat_thickness: float = 0.13
     clad_thickness: float = in_to_cm(0.015)
@@ -25,8 +27,20 @@ class fuel:
     plate_num: int = 30
     fuel_outer: float = (meat_thickness + 2 * clad_thickness + nominal_dist) * plate_num - nominal_dist
 
-
+fuel = fuel_class()
 
 @dataclass
-class vessel:
+class vessel_class:
     temp_var: float = 1.0
+
+vessel = vessel_class()
+
+@dataclass
+class materials_class:
+    material_dict: None | dict = None
+
+    def set_materials(self, material_dict: dict) -> None:
+        """Set the material dictionary."""
+        self.material_dict = material_dict
+
+materials = materials_class()

@@ -27,8 +27,6 @@ plot.width = (20, 20)
 plot.pixels = (1400, 1400)
 plot.color_by = 'material'
 
-print(2+2)
-# Poopy butthole
 # I havent fixed the material colors yet lol
 # plot.colors = {
 #     aluminum: 'lightgray',

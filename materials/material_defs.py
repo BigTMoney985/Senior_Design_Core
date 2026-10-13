@@ -3,6 +3,8 @@ try:
 except ImportError:
     raise ImportError("The openmc module is required but not installed.")
 
+import config.global_vars as gv
+
 
 def create_materials(mat_choice: str):
     '''Create and return a set of predefined materials based on the chosen material type.'''
@@ -145,6 +147,10 @@ def create_materials(mat_choice: str):
 
     materials = openmc.Materials(list(materials_dict.values()))
     materials.export_to_xml()
+
+    
+    gv.materials.set_materials(material_dict=materials_dict)  # Store the materials dictionary in global_vars
+
     return materials_dict
 
 
