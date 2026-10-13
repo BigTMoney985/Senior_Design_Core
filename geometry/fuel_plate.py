@@ -1,7 +1,6 @@
 import openmc 
 import numpy as np
-from config.global_vars import fuel, fluxtrap
-import materials
+from config.global_vars import fuel
 from materials.material_defs import create_materials
 
 class FuelPlateGeometry:
@@ -80,7 +79,9 @@ class FuelPlateGeometry:
             if i != fuel.plate_num - 1:
                 water_cells.append(openmc.Cell(region=water_region, fill=materials_dict['water']))
 
-        return clad_cells, fuel_cells, water_cells
+                cells_full = clad_cells + fuel_cells + water_cells
+
+        return cells_full
 
 
 

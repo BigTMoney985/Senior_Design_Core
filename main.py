@@ -4,13 +4,11 @@ from geometry.fuel_plate import FuelPlateGeometry
 from matplotlib import pyplot as plt
 from config import global_vars as gv
 
+# INITIALIZATION OF FUEL TYPE
+
 plateclass = FuelPlateGeometry('u3si2')
 
-clad_cells, fuel_cells, water_cells = plateclass.create_plate_cells()
-
-cells = clad_cells + fuel_cells + water_cells
-
-print(type(cells))
+cells = plateclass.create_plate_cells()
 
 element_universe = openmc.Universe(cells=cells)
 
