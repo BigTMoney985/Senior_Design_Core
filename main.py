@@ -19,6 +19,8 @@ universe = gv.element_ring_class.universe  # Get the universe from the global va
 
 # PLOTTING THE FUEL ELEMENT GEOMETRY
 plot = openmc.Plot()
+plot.show_overlaps = True
+plot.overlap_color = 'orange'
 plot.basis = 'xy'
 plot.origin = (0, 0, 10)
 plot.width = (40, 40)

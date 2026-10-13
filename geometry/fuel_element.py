@@ -62,7 +62,6 @@ class FuelElementGeometry:
 #surfaces[3] -> outer_clad_thickness
 
     def create_plate_cells(self):
-
         inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness = self.define_plates()
         # Creating surfaces to actually work with
 
@@ -91,18 +90,16 @@ class FuelElementGeometry:
             meat_region = +inner_meat_thickness[i] & -outer_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
             clad_outer_region = +outer_meat_thickness[i] & -outer_clad_thickness[i] & -self.fuel_angle & +self.fuel_left
 
-            if i != fuel.plate_num - 1:
-                water_region = +outer_clad_thickness[i] & -inner_clad_surfaces[i+1] & -self.fuel_angle & +self.fuel_left
-
             clad_cells.append(openmc.Cell(region=clad_inner_region, fill=materials_dict['aluminum']))
             fuel_cells.append(openmc.Cell(region=meat_region, fill=materials_dict['fuel']))
             clad_cells.append(openmc.Cell(region=clad_outer_region, fill=materials_dict['aluminum']))
+
             if i != fuel.plate_num - 1:
+                water_region = +outer_clad_thickness[i] & -inner_clad_surfaces[i+1] & -self.fuel_angle & +self.fuel_left
                 water_cells.append(openmc.Cell(region=water_region, fill=materials_dict['water']))
 
-                cells_full = clad_cells + fuel_cells + water_cells
-
-        return cells_full
+        # Outside the loop:
+        return clad_cells + fuel_cells + water_cells
 
     def create_fuel_universe(self) -> openmc.Universe:
             '''Create a universe that contains the entire fuel element. This universe can be used for rotation or other transformations.'''
@@ -119,27 +116,19 @@ class FuelElementGeometry:
 
 
     def create_fuel_cell(self) -> openmc.Cell:
-        '''Create a cell that contains the entire fuel element. This cell can be used for rotation or other transformations.'''
-        
-        if self.fuel_universe is None:
-                    self.create_fuel_universe()
-
-        # Need to find bound of element itself to set as cell for rotation
-        element_bound_out = openmc.ZCylinder(r=self.outer_thickness)
-        element_bound_in = openmc.ZCylinder(r=self.inner_thickness)
-        element_region = +element_bound_in & -element_bound_out & -self.fuel_angle & +self.element_left_bound
-
-
-
-        # automatically adds some vars to the global_vars file for the fuel element universe and cell
-        element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) # type: ignore
-
-
         if self.fuel_universe is None:
             self.create_fuel_universe()
 
-        fuel_cell = openmc.Cell(region=element_region, fill=self.fuel_universe)
-        return fuel_cell
+        element_bound_out = openmc.ZCylinder(r=self.outer_thickness)
+        element_bound_in = openmc.ZCylinder(r=self.inner_thickness)
+
+        # FIXED: Use element_angle (45 deg) instead of fuel_angle
+        # In OpenMC CSG, element_angle is a=-1, b=1 -> -x + y = 0.
+        # Below y = x means (-x + y <= 0), which is the negative halfspace (-self.element_angle)
+        element_region = +element_bound_in & -element_bound_out & -self.element_angle & +self.element_left_bound
+
+        element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) # type: ignore
+        return openmc.Cell(region=element_region, fill=self.fuel_universe)
 
 
 
