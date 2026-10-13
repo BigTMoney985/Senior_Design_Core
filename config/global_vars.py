@@ -11,6 +11,12 @@ def in_to_cm(inches: float) -> float:
     return inches * 2.54
 
 @dataclass
+class user_opts_class:
+    run_mode: str = 'plot'  # Default run mode is 'plot'
+    fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
+user_opts = user_opts_class()
+
+@dataclass
 class fluxtrap_class:
     r_in: float = 4.0 # Inner radius of the flux trap
     # NOTE, this may need to be adjusted based on the specific flux trap design
@@ -20,10 +26,10 @@ fluxtrap = fluxtrap_class()
 class fuel_class:
     temp_var: float = 1.0
     meat_thickness: float = 0.13 # Thickness of the fuel meat in cm
-    clad_thickness: float = in_to_cm(0.015)
+    clad_thickness: float = in_to_cm(0.015) #thickness of the clad
     nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
     fuel_inner: float = 8 # Inner radius of the fuel element
-    plate_num: int = 30
+    plate_num: int = 30 #number of fuel plates in the fuel element
     fuel_outer: float = (meat_thickness + 2 * clad_thickness + nominal_dist) * plate_num - nominal_dist
 fuel = fuel_class()
 
@@ -31,6 +37,8 @@ fuel = fuel_class()
 class vessel_class:
     temp_var: float = 1.0
 vessel = vessel_class()
+
+# EVERYTHING BELOW HERE IS NOT NECESSARILY USER-DEFINED, BUT IS USED INTERNALLY FOR GEOMETRY AND MATERIAL DEFINITIONS
 
 @dataclass
 class materials_class:
@@ -41,11 +49,6 @@ class materials_class:
         self.material_dict = material_dict
 materials = materials_class()
 
-@dataclass
-class user_opts_class:
-    run_mode: str = 'plot'  # Default run mode is 'plot'
-    fuel_choice: str = 'u3si2'  # Default fuel choice is 'u3si2'
-user_opts = user_opts_class()
 
 
 # MORE TECHNICAL VARIABLES FOR FUEL ELEMENTS

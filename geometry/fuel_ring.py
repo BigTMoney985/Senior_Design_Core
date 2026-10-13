@@ -42,11 +42,12 @@ class FuelRingGeometry:
             wedge_cell.rotation=(0.0, 0.0, angle_start)
             ring_universe.add_cell(wedge_cell)
 
+        element_ring_class.set_universe(ring_universe)    
+
         return ring_universe
 
     def create_fuel_ring_geometry(self) -> openmc.Geometry:
         ring_universe = self.create_fuel_ring()
-        element_ring_class.set_universe(ring_universe)
         return openmc.Geometry(root=ring_universe)
 
 

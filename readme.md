@@ -3,8 +3,9 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 
 ## TODO
 
-1. Add all the iterables into the global_vars.py area (such as fuel choice)
-2. Maybe make an input yaml?
-3. Get the ring fully made for the fuel elements.
-4. Add a separate plotter.py file
+- [ ] Add all the iterables into the global_vars.py area (such as fuel choice)
+- [ ] Maybe make an input yaml?
+- [x] Get the ring fully made for the fuel elements.
+- [ ] Add a separate plotter.py file
+- [ ] Add heights to fuel and water
 
