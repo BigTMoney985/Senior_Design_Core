@@ -27,21 +27,21 @@ plot.width = (20, 20)
 plot.pixels = (1400, 1400)
 plot.color_by = 'material'
 
-
-plot.colors = {
-    aluminum: 'lightgray',
-    ss_304: 'darkgray',
-    ss_304L: 'dimgray',
-    concrete: 'lightblue',
-    air: 'white',
-    be_metal: 'lightyellow',
-    graphite: 'black',
-    boron: 'green',
-    borated_ss306: 'darkgreen',
-    fuel: 'red',
-    water: 'blue',
-    zr_barrier: 'orange'
-}
+# I havent fixed the material colors yet lol
+# plot.colors = {
+#     aluminum: 'lightgray',
+#     ss_304: 'darkgray',
+#     ss_304L: 'dimgray',
+#     concrete: 'lightblue',
+#     air: 'white',
+#     be_metal: 'lightyellow',
+#     graphite: 'black',
+#     boron: 'green',
+#     borated_ss306: 'darkgreen',
+#     fuel: 'red',
+#     water: 'blue',
+#     zr_barrier: 'orange'
+# }
 
 
 plots = openmc.Plots([plot])
