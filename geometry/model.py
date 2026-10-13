@@ -8,16 +8,16 @@ def create_geometry():
     water_geom = WaterGeometry()
 
     # Create shared boundary cylinders
-    inner_cyl, outer_cyl, graveyard = water_geom.create_surfaces()
+    inner_cyl, outer_cyl = water_geom.create_surfaces()
 
     # 1. Water cells (central cavity + outer reflector)
-    water_cells = water_geom.create_water_cells(inner_cyl, outer_cyl, graveyard)
+    water_cells = water_geom.create_water_cells(inner_cyl, outer_cyl)
 
     # 2. Fuel ring cell (bounded strictly to the annular space)
     ring_cell = openmc.Cell(
         name="fuel_ring_annulus",
         fill=fuel_ring_geometry.create_fuel_ring(),
-        region=+inner_cyl & -outer_cyl
+        region=+inner_cyl & -outer_cyl & gv.graveyard.graveyard_region
     )
 
     # 3. Assemble root universe

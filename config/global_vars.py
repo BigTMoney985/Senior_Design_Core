@@ -14,7 +14,6 @@ def in_to_cm(inches: float) -> float:
 class user_opts_class:
     run_mode: str = 'plot'  # Default run mode is 'plot'
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
-    graveyard: float = 120
 user_opts = user_opts_class()
 
 @dataclass
@@ -31,7 +30,10 @@ class fuel_class:
     nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
     fuel_inner: float = 8 # Inner radius of the fuel element
     plate_num: int = 30 #number of fuel plates in the fuel element
-    fuel_outer: float = 20 # placeholder value
+    height: float = 120 # How tall the elements are?
+
+    #PLACEHOLDER VALUE ============
+    fuel_outer: float = 67
 fuel = fuel_class()
 
 @dataclass
@@ -49,6 +51,19 @@ class materials_class:
         """Set the material dictionary."""
         self.material_dict = material_dict
 materials = materials_class()
+
+@dataclass
+class graveyard_class:
+    graveyard_r: float = 150
+
+    def __init__(self):
+        grave_cyl = openmc.ZCylinder(r=self.graveyard_r, boundary_type='vacuum')
+        grave_top = openmc.ZPlane(z0=fuel.height, boundary_type='vacuum')
+        grave_bot = openmc.ZPlane(z0=0, boundary_type='vacuum')
+
+        self.graveyard_region = -grave_cyl & +grave_bot & -grave_top
+graveyard = graveyard_class()
+
 
 
 
