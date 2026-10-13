@@ -1,6 +1,6 @@
 # THIS WILL CONTAIN RUN MODES AND WHATNOT
 import openmc
-from geometry.fuel_element import create_fuel_geometry
+from geometry.fuel_element import FuelElementGeometry
 from matplotlib import pyplot as plt
 from config import global_vars as gv
 from materials.material_defs import create_materials
@@ -9,10 +9,11 @@ from materials.material_defs import create_materials
 
 # INITIALIZATION OF FUEL TYPE
 material_dict = create_materials(gv.user_opts.fuel_choice)
-geom = create_fuel_geometry()
+fuel_geometry = FuelElementGeometry()
+geom = fuel_geometry.create_fuel_geometry()
 geom.export_to_xml()
 
-
+# PLOTTING THE FUEL ELEMENT GEOMETRY
 plot = openmc.Plot()
 plot.basis = 'xy'
 plot.origin = (12, 8, 10)

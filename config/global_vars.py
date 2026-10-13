@@ -18,10 +18,10 @@ fluxtrap = fluxtrap_class()
 @dataclass
 class fuel_class:
     temp_var: float = 1.0
-    meat_thickness: float = 0.13
+    meat_thickness: float = 0.13 # Thickness of the fuel meat in cm
     clad_thickness: float = in_to_cm(0.015)
-    nominal_dist: float = 0.15
-    fuel_inner: float = 8
+    nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
+    fuel_inner: float = 8 # Inner radius of the fuel element
     plate_num: int = 30
     fuel_outer: float = (meat_thickness + 2 * clad_thickness + nominal_dist) * plate_num - nominal_dist
 fuel = fuel_class()

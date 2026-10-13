@@ -6,11 +6,18 @@ from materials.material_defs import create_materials
 
 class FuelElementGeometry:
     def __init__(self):
+        # DEFINED FUEL-TYPE
         self.fuel_choice = user_opts.fuel_choice
+
+
+        # DEFINED BOUNDARIES FOR THE FUEL ELEMENT
         self.element_left_bound = openmc.YPlane(y0=0) #left bound of full element
         self.fuel_left = openmc.YPlane(y0=fuel.clad_thickness) # left bound of the fuel region.
         self.fuel_angle = openmc.Plane(a=-1.0, b=1.0, c=0.0, d=np.sqrt(2)*fuel.clad_thickness)
         self.element_angle = openmc.Plane(a=-1.0, b=1.0, c=0, d=0)
+
+        # DEFINED UNIVERSE FOR THE FUEL ELEMENT
+        self.fuel_universe = None # This will be set when create_fuel_universe is called
 
     def get_planes(self):
         return self.element_left_bound, self.fuel_left, self.fuel_angle, self.element_angle
@@ -36,6 +43,7 @@ class FuelElementGeometry:
             inner_meat_thickness.append(openmc.ZCylinder(r=_inner_meat_thickness))
             outer_meat_thickness.append(openmc.ZCylinder(r=_outer_meat_thickness))
             outer_clad_thickness.append(openmc.ZCylinder(r=_outer_clad_thickness))
+
 
         return inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness
 # ==================== DEFINING PLATES ====================
@@ -89,13 +97,34 @@ class FuelElementGeometry:
 
         return cells_full
 
-def create_fuel_geometry() -> openmc.Geometry:
-    elementclass = FuelElementGeometry()
-    cells = elementclass.create_plate_cells()
-    element_universe = openmc.Universe(cells=cells)
-    geom = openmc.Geometry(element_universe)
-    #geom.export_to_xml()
-    return geom
+    def create_fuel_universe(self) -> openmc.Universe:
+            '''Create a universe that contains the entire fuel element. This universe can be used for rotation or other transformations.'''
+            cells = self.create_plate_cells()
+            element_universe = openmc.Universe(cells=cells)
+            self.fuel_universe = element_universe  # Store the universe in the instance variable
+            return self.fuel_universe
+
+    def create_fuel_geometry(self) -> openmc.Geometry:
+        '''Create the fuel geometry and return an OpenMC Geometry object.'''
+        element_universe = self.create_fuel_universe()
+        geom = openmc.Geometry(element_universe)
+        return geom
+
+
+    def create_fuel_cell(self) -> openmc.Cell:
+        '''Create a cell that contains the entire fuel element. This cell can be used for rotation or other transformations.'''
+        # Need to find bound of element itself to set as cell for rotation
+        element_bound_out = openmc.ZCylinder(r=fuel.fuel_outer)
+        element_bound_in = openmc.ZCylinder(r=fuel.fuel_inner)
+        element_region = +element_bound_in & -element_bound_out & -self.fuel_angle & +self.element_left_bound
+
+        if self.fuel_universe is None:
+            self.create_fuel_universe()
+
+        fuel_cell = openmc.Cell(region=element_region, fill=self.fuel_universe)
+        return fuel_cell
+
+
 
 
 
