@@ -1,12 +1,14 @@
 # THIS WILL CONTAIN RUN MODES AND WHATNOT
 import openmc
-from geometry.fuel_plate import create_fuel_geometry
+from geometry.fuel_element import create_fuel_geometry
 from matplotlib import pyplot as plt
 from config import global_vars as gv
+from materials.material_defs import create_materials
 
 
 
 # INITIALIZATION OF FUEL TYPE
+material_dict = create_materials(gv.user_opts.fuel_choice)
 geom = create_fuel_geometry()
 geom.export_to_xml()
 
@@ -19,8 +21,6 @@ plot.pixels = (2160, 2160)
 plot.color_by = 'material'
 
 # This part is to set the colors for each material in the plot.
-
-material_dict = gv.materials.material_dict
 
 if material_dict is not None:
     # I havent fixed the material colors yet lol

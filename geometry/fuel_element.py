@@ -1,10 +1,10 @@
 import openmc 
 import numpy as np
-from config.global_vars import fuel, user_opts
+from config.global_vars import fuel, user_opts, materials
 from materials.material_defs import create_materials
 
 
-class FuelPlateGeometry:
+class FuelElementGeometry:
     def __init__(self):
         self.fuel_choice = user_opts.fuel_choice
         self.element_left_bound = openmc.YPlane(y0=0) #left bound of full element
@@ -51,7 +51,12 @@ class FuelPlateGeometry:
         inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness = self.define_plates()
         # Creating surfaces to actually work with
 
-        materials_dict = create_materials(self.fuel_choice)
+        materials_dict = materials.material_dict
+
+        if materials_dict is None:
+            materials_dict = create_materials(self.fuel_choice)
+            materials.set_materials(material_dict=materials_dict)
+
         # Creating materials dictionary for the fuel, cladding, and water cells
 
         clad_cells = []
@@ -85,8 +90,8 @@ class FuelPlateGeometry:
         return cells_full
 
 def create_fuel_geometry() -> openmc.Geometry:
-    plateclass = FuelPlateGeometry()
-    cells = plateclass.create_plate_cells()
+    elementclass = FuelElementGeometry()
+    cells = elementclass.create_plate_cells()
     element_universe = openmc.Universe(cells=cells)
     geom = openmc.Geometry(element_universe)
     #geom.export_to_xml()
