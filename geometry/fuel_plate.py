@@ -61,7 +61,7 @@ class FuelPlateGeometry:
         for i in range(fuel.plate_num):
             if i == 0:
                 clad_left = +self.element_left_bound & -self.fuel_left & -outer_clad_thickness[-1] & +inner_clad_surfaces[0]
-                clad_right = +inner_clad_surfaces[0] & -outer_clad_thickness[-1] & -self.element_angle & +self.fuel_angle
+                clad_right = +inner_clad_surfaces[0] & -outer_clad_thickness[-1] & +self.element_angle & -self.fuel_angle
 
                 clad_cells.append(openmc.Cell(region=clad_left, fill=materials_dict['aluminum']))
                 clad_cells.append(openmc.Cell(region=clad_right, fill=materials_dict['aluminum']))
