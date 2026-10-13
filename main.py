@@ -4,20 +4,22 @@ from geometry.fuel_element import FuelElementGeometry
 from matplotlib import pyplot as plt
 from config import global_vars as gv
 from materials.material_defs import create_materials
+from geometry.fuel_ring import FuelRingGeometry
 
 
 
 # INITIALIZATION OF FUEL TYPE
 material_dict = create_materials(gv.user_opts.fuel_choice)
 fuel_geometry = FuelElementGeometry()
-geom = fuel_geometry.create_fuel_geometry()
+fuel_ring_geometry = FuelRingGeometry()
+geom = fuel_ring_geometry.create_fuel_ring_geometry()  # Create the fuel ring geometry
 geom.export_to_xml()
 
 # PLOTTING THE FUEL ELEMENT GEOMETRY
 plot = openmc.Plot()
 plot.basis = 'xy'
-plot.origin = (12, 8, 10)
-plot.width = (15, 15)
+plot.origin = (0, 0, 10)
+plot.width = (40, 40)
 plot.pixels = (2160, 2160)
 plot.color_by = 'material'
 
