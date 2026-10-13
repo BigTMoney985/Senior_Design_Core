@@ -16,6 +16,9 @@ class FuelElementGeometry:
         self.fuel_angle = openmc.Plane(a=-1.0, b=1.0, c=0.0, d=np.sqrt(2)*fuel.clad_thickness)
         self.element_angle = openmc.Plane(a=-1.0, b=1.0, c=0, d=0)
 
+        self.outer_thickness = fuel.fuel_inner # This will be set when define_plates is called
+        self.inner_thickness = fuel.fuel_outer # This will be set when define_plates is called
+
         # DEFINED UNIVERSE FOR THE FUEL ELEMENT
         self.fuel_universe = None # This will be set when create_fuel_universe is called
 
@@ -43,6 +46,10 @@ class FuelElementGeometry:
             inner_meat_thickness.append(openmc.ZCylinder(r=_inner_meat_thickness))
             outer_meat_thickness.append(openmc.ZCylinder(r=_outer_meat_thickness))
             outer_clad_thickness.append(openmc.ZCylinder(r=_outer_clad_thickness))
+
+            if i == fuel.plate_num - 1:
+                self.outer_thickness = _outer_clad_thickness
+                self.inner_thickness = inner_clad_surfaces[0].r
 
 
         return inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness
@@ -113,13 +120,16 @@ class FuelElementGeometry:
 
     def create_fuel_cell(self) -> openmc.Cell:
         '''Create a cell that contains the entire fuel element. This cell can be used for rotation or other transformations.'''
+        
+        if self.fuel_universe is None:
+                    self.create_fuel_universe()
+
         # Need to find bound of element itself to set as cell for rotation
-        element_bound_out = openmc.ZCylinder(r=fuel.fuel_outer)
-        element_bound_in = openmc.ZCylinder(r=fuel.fuel_inner)
+        element_bound_out = openmc.ZCylinder(r=self.outer_thickness)
+        element_bound_in = openmc.ZCylinder(r=self.inner_thickness)
         element_region = +element_bound_in & -element_bound_out & -self.fuel_angle & +self.element_left_bound
 
-        if self.fuel_universe is None:
-            self.create_fuel_universe()
+
 
         # automatically adds some vars to the global_vars file for the fuel element universe and cell
         element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) # type: ignore

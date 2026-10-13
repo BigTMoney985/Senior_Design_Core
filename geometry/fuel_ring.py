@@ -18,20 +18,21 @@ class FuelRingGeometry:
             if i == 0:
                 # For the first element, we can just use the base element without rotation
                 rotated_element = self.element_base
+                rotated_element.id = self.element_base.id * 100 + 1  # Assign the same ID as the base element
 
             else:
                 # For subsequent elements, we need to rotate the base element
                 rotated_element = openmc.Cell(region=self.element_base.region, fill=self.element_base.fill)
-                rotated_element.rotation = (0, 0, np.radians(angle))  # Rotate around the z-axis
-
-            rotated_element.id = self.element_base.id * 100 + i  # Assign a unique ID to each rotated element
+                rotated_element.rotation = (0, 0, angle)  # Rotate around the z-axis
+                rotated_element.id = self.element_base.id + i  # Assign a unique ID to each rotated element
             self.ring_universe.add_cell(rotated_element)
 
         return self.ring_universe
 
     def create_fuel_ring_geometry(self) -> openmc.Geometry:
         ring_universe = self.create_fuel_ring()
-        geom = openmc.Geometry(ring_universe)
+        ring_universe.id = 1000  # Assign a unique ID to the ring universe
+        geom = openmc.Geometry(root=ring_universe)
         return geom
 
 
