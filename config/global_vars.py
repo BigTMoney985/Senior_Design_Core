@@ -28,7 +28,7 @@ class fuel_class:
     meat_thickness: float = 0.13 # Thickness of the fuel meat in cm
     clad_thickness: float = in_to_cm(0.015) #thickness of the clad
     nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
-    fuel_inner: float = 8 # Inner radius of the fuel element
+    fuel_inner: float = 4 # Inner radius of the fuel element
     plate_num: int = 30 #number of fuel plates in the fuel element
     height: float = 120 # How tall the elements are?
 
@@ -57,7 +57,7 @@ class graveyard_class:
     graveyard_r: float = 150
 
     def __init__(self):
-        grave_cyl = openmc.ZCylinder(r=self.graveyard_r, boundary_type='vacuum')
+        grave_cyl = openmc.ZCylinder(r=self.graveyard_r, boundary_type='reflective')
         grave_top = openmc.ZPlane(z0=fuel.height, boundary_type='vacuum')
         grave_bot = openmc.ZPlane(z0=0, boundary_type='vacuum')
 

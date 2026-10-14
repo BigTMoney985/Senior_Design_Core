@@ -49,7 +49,7 @@ if gv.user_opts.run_mode == 'plot':
     openmc.plot_geometry()
 
 else:
-    bounds = [-40, -40, 0, 40, 40, 120,]
+    bounds = [-20, -20, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
 
     settings = openmc.Settings(
