@@ -80,7 +80,7 @@ class central_blades:
         ))
 
         inner_blade.append(openmc.Cell(
-            name='central blade poison',
+            name='central blade transparent section',
             fill=None,
             region=(inner_blade_cyl_reg & -self.surface_dict['top'] & +self.surface_dict['semi_end'])
         ))
@@ -90,7 +90,7 @@ class central_blades:
             region=(inner_blade_cyl_reg & -self.surface_dict['semi_end'] & +self.surface_dict['semi_start'])
         ))
         inner_blade.append(openmc.Cell(
-            name='central blade transparent section',
+            name='central blade poison',
             fill=None,
             region=(inner_blade_cyl_reg & -self.surface_dict['semi_start'] & +self.surface_dict['bottom'])
         ))
@@ -149,7 +149,10 @@ class central_blades:
         return univs
 
     def create_channel_cell(self, z_insertions: list | None = None):
-
+        '''Function for withdrawing central control blades.
+        You must provide a list as long as the number of control blades (7)
+        The first value will lead to the the withdrawal of reactivity, the other 6
+        will insert reactivity in a given hexagonal region of the core.'''
         univs = self.create_geometry()
         inner_univ = univs[0]
         outer_univs = univs[1:]
@@ -184,7 +187,7 @@ class central_blades:
             )
         inner_cell.translation = (0.0, 0.0, z_insertions[0])
         channel_cells.append(inner_cell)
-        
+
         # -----------------------------------------------------------
         # 2. Outer Annular Wedge Channel Slots
         # -----------------------------------------------------------
