@@ -70,6 +70,8 @@ else:
                                 openmc.MaterialFilter([material_dict['fuel']])]
 
     tallies.append(fuel_therm_abs_rate)
+
+    tallies.export_to_xml()
     
     bounds = [-20, -20, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
