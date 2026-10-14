@@ -100,7 +100,7 @@ def create_materials(mat_choice: str):
     if mat_choice.lower() == 'u3si2':
         # U3Si2-Al
         u3si2 = openmc.Material(name='U3Si2')
-        u3si2.add_element('U', 3, enrichment=0.1975) #Check 4.8 g/U/cm3
+        u3si2.add_element('U', 3, enrichment=19.75) #Check 4.8 g/U/cm3
         u3si2.add_element('Si', 2)
         u3si2.set_density('g/cm3', 11.97) 
 
@@ -111,7 +111,7 @@ def create_materials(mat_choice: str):
     elif mat_choice.lower() == 'u3o8':
         # U3O8
         u3o8 = openmc.Material(name='U3O8')
-        u3o8.add_element('U', 3, enrichment=0.1975)
+        u3o8.add_element('U', 3, enrichment=19.75)
         u3o8.add_element('O', 8)
         u3o8.set_density('g/cm3', 10.96)
         fuel = u3o8
@@ -119,7 +119,7 @@ def create_materials(mat_choice: str):
     elif mat_choice.lower() == 'u10mo':
         # U-10Mo
         u10mo = openmc.Material(name='U-10Mo')
-        u10mo.add_element('U', 0.9, enrichment=0.1975, percent_type='wo')
+        u10mo.add_element('U', 0.9, enrichment=19.75, percent_type='wo')
         u10mo.add_element('Mo', 0.1, percent_type='wo')
         u10mo.set_density('g/cm3', 17.2)
         # NOTE, REMEMBER TO ADD A FEW uM OF ZIRCONIUM BETWEEN THE FUEL AND THE CLAD
