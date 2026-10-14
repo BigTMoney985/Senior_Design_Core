@@ -17,6 +17,12 @@ class user_opts_class:
 user_opts = user_opts_class()
 
 @dataclass
+class reflector_class:
+    be_thickness = 31 # beryllium thickness
+    water_gap = 0.5 # gap between water and beryllium
+reflector = reflector_class()
+
+@dataclass
 class fluxtrap_class:
     r_in: float = 4.0 # Inner radius of the flux trap
     # NOTE, this may need to be adjusted based on the specific flux trap design
