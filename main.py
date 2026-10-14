@@ -58,9 +58,10 @@ else:
     mesh.lower_left = [-20.0, -20.0]  # pyright: ignore[reportAttributeAccessIssue]
     mesh.upper_right = [20.0, 20.0] # pyright: ignore[reportAttributeAccessIssue]
     mesh_filter = openmc.MeshFilter(mesh)
-    tally = openmc.Tally()
+    tally = openmc.Tally(name='mesh tally')
     tally.filters = [mesh_filter]
     tally.scores = ['absorption', 'flux', 'fission']
+    tallies.append(tally)
 
     # Thermal Flux Utilization tallies
     fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
@@ -68,7 +69,7 @@ else:
     fuel_therm_abs_rate.filters = [openmc.EnergyFilter([0., 0.625]),
                                 openmc.MaterialFilter([material_dict['fuel']])]
 
-    tallies.append([tally, fuel_therm_abs_rate])
+    tallies.append(fuel_therm_abs_rate)
     
     bounds = [-20, -20, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
@@ -76,12 +77,14 @@ else:
     settings = openmc.Settings(
         run_mode = 'eigenvalue',
         particles = int(1e4),
-        batches = 150,
-        inactive = 10,
+        batches = 250,
+        inactive = 15,
         source = openmc.IndependentSource(space=uniform_dist),
         output = {'tallies': True},
     )
     settings.export_to_xml()
+
+    openmc.run()
 
 
 
