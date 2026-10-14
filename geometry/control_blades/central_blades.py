@@ -52,6 +52,7 @@ class central_blades:
 
     def create_cells(self):
         surface_dict = self.create_surfaces()
+        blades = []
 
         inner_blade_cyl_reg = -surface_dict['mid_cyl'] & +surface_dict['inner_cyl']
         outer_blade_cyl_reg = -surface_dict['outer_cyl'] & +surface_dict['mid_cyl']
@@ -73,9 +74,9 @@ class central_blades:
             fill=None,
             region=(inner_blade_cyl_reg & -surface_dict['semi_start'] & +surface_dict['bottom'])
         )
+        blades.append([inner_poison, inner_semi, inner_transparent])
 
         #OUTER ANNULAR RING DEFS
-        blades = []
         wedge_planes = surface_dict['plane_list']
         plane_no = len(wedge_planes)
         for i in range(plane_no):
@@ -84,19 +85,18 @@ class central_blades:
             wedge_region = +wedge_planes[i] & -wedge_planes[((i + 1) % plane_no)]
             
             outer_poison = openmc.Cell(
-                name='central blade poison',
+                name=f'outer central blade {i+1} poison',
                 fill=None,
                 region=(outer_blade_cyl_reg & -surface_dict['top'] & +surface_dict['semi_end'] & wedge_region)
             )
             outer_semi = openmc.Cell(
-                name='central blade semi-poison',
+                name=f'outer central blade {i+1} semi-poison',
                 fill=None,
                 region=(outer_blade_cyl_reg & -surface_dict['semi_end'] & +surface_dict['semi_start'] & wedge_region)
             )
             outer_transparent = openmc.Cell(
-                name='central blade transparent section',
+                name=f'outer central blade {i+1} transparent section',
                 fill=None,
                 region=(outer_blade_cyl_reg & -surface_dict['semi_start'] & +surface_dict['bottom'] & wedge_region)
             )
-
-        pass
+            blades.append([outer_poison, outer_semi, outer_transparent])
