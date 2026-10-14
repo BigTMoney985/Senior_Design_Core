@@ -27,6 +27,7 @@ class central_blades:
         semi_end = openmc.ZPlane(z0=self.semi_end)
         top = openmc.ZPlane(z0=self.end)
 
+
         planes = []
         for i in range(gv.control_blade.central_blade_num):
             plane_angle = i * self.blade_deg
@@ -52,29 +53,42 @@ class central_blades:
 
     def create_cells(self):
         surface_dict = self.create_surfaces()
-        blades = []
+        inner_blade = []
+        outer_blades = []
 
+        entire_blade_annulus = -surface_dict['outer_cyl'] & -surface_dict['inner_cyl']
         inner_blade_cyl_reg = -surface_dict['mid_cyl'] & +surface_dict['inner_cyl']
         outer_blade_cyl_reg = -surface_dict['outer_cyl'] & +surface_dict['mid_cyl']
 
         # INNER ANNULAR RING DEFS
         # NOTE, REMEMBER TO ADD THE MATERIALS AT SOME POINT 
-        inner_poison = openmc.Cell(
+
+        inner_blade.append(openmc.Cell(
+            name='blade universe water below',
+            fill=None,
+            region=inner_blade_cyl_reg & -surface_dict['bottom']
+        ))
+        inner_blade.append(openmc.Cell(
+            name='blade universe water above',
+            fill=None,
+            region=inner_blade_cyl_reg & -surface_dict['top']
+        ))
+
+        inner_blade.append(openmc.Cell(
             name='central blade poison',
             fill=None,
             region=(inner_blade_cyl_reg & -surface_dict['top'] & +surface_dict['semi_end'])
-        )
-        inner_semi = openmc.Cell(
+        ))
+        inner_blade.append(openmc.Cell(
             name='central blade semi-poison',
             fill=None,
             region=(inner_blade_cyl_reg & -surface_dict['semi_end'] & +surface_dict['semi_start'])
-        )
-        inner_transparent = openmc.Cell(
+        ))
+        inner_blade.append(openmc.Cell(
             name='central blade transparent section',
             fill=None,
             region=(inner_blade_cyl_reg & -surface_dict['semi_start'] & +surface_dict['bottom'])
-        )
-        blades.append([inner_poison, inner_semi, inner_transparent])
+        ))
 
         #OUTER ANNULAR RING DEFS
         wedge_planes = surface_dict['plane_list']
@@ -83,6 +97,17 @@ class central_blades:
             
             
             wedge_region = +wedge_planes[i] & -wedge_planes[((i + 1) % plane_no)]
+
+            below_water = openmc.Cell(
+                name=f'outer blade {i+1} universe water below',
+                fill=None,
+                region=outer_blade_cyl_reg & -surface_dict['bottom']
+            )
+            above_water = openmc.Cell(
+                name=f'outer blade {i+1} universe water above',
+                fill=None,
+                region=outer_blade_cyl_reg & -surface_dict['top']
+            )
             
             outer_poison = openmc.Cell(
                 name=f'outer central blade {i+1} poison',
@@ -99,4 +124,13 @@ class central_blades:
                 fill=None,
                 region=(outer_blade_cyl_reg & -surface_dict['semi_start'] & +surface_dict['bottom'] & wedge_region)
             )
-            blades.append([outer_poison, outer_semi, outer_transparent])
+            outer_blades.append([below_water, above_water, outer_poison, outer_semi, outer_transparent])
+
+
+        return inner_blade, outer_blades
+    
+    def create_geometry(self):
+        blades = self.create_cells()
+
+        rod_univ = openmc.Universe(cells=blades)
+        rod_cell_big = openmc.Cell(fill=rod_univ)

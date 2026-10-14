@@ -28,6 +28,8 @@ def create_geometry():
 
     water_cells[1].region = water_cells[1].region & ~(be_cell.region) #type: ignore
 
+    # 4 Control blade region
+
     # 4. Assemble root universe
     root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell])
     root_geometry = openmc.Geometry(root=root_universe)
