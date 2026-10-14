@@ -3,7 +3,8 @@ import config.global_vars as gv
 
 class be_reflector:
     def __init__(self) -> None:
-        self.r_inner = gv.reflector.water_gap + gv.fuel.fuel_outer
+        if gv.control_blade.rad_out_central is not None:
+            self.r_inner = gv.reflector.water_gap + gv.control_blade.rad_out_central
         self.r_outer = self.r_inner + gv.reflector.be_thickness
         self.be_met = gv.materials.material_dict['be_metal'] # type: ignore
 
