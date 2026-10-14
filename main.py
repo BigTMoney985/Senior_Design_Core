@@ -50,9 +50,25 @@ if gv.user_opts.run_mode == 'plot':
 
 else:
     # TALLIES =================================
-    material_filter = openmc.MaterialFilter([material_dict['water'].id, material_dict['fuel'].id, material_dict['aluminum'].id])
+    # material_filter = openmc.MaterialFilter([material_dict['water'].id, material_dict['fuel'].id, material_dict['aluminum'].id])
+    tallies = openmc.Tallies()
+    
+    mesh = openmc.RegularMesh()
+    mesh.dimension = [500, 500]
+    mesh.lower_left = [-20.0, -20.0]  # pyright: ignore[reportAttributeAccessIssue]
+    mesh.upper_right = [20.0, 20.0] # pyright: ignore[reportAttributeAccessIssue]
+    mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally()
-    tally.filters = [material_filter]
+    tally.filters = [mesh_filter]
+    tally.scores = ['absorption', 'flux', 'fission']
+
+    # Thermal Flux Utilization tallies
+    fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
+    fuel_therm_abs_rate.scores = ['absorption']
+    fuel_therm_abs_rate.filters = [openmc.EnergyFilter([0., 0.625]),
+                                openmc.MaterialFilter([material_dict['fuel']])]
+
+    tallies.append([tally, fuel_therm_abs_rate])
     
     bounds = [-20, -20, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
@@ -63,11 +79,9 @@ else:
         batches = 150,
         inactive = 10,
         source = openmc.IndependentSource(space=uniform_dist),
-        output = {'tallies': False},
+        output = {'tallies': True},
     )
     settings.export_to_xml()
-
-    openmc.run()
 
 
 
