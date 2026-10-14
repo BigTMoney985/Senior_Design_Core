@@ -27,6 +27,7 @@ reflector = reflector_class()
 class control_blade_class:
     blade_thickness = 0.25 # Thickness of each blade, central blades are two in series, so thickness will be double
     central_blade_num = 6 #number of blades in the central area
+    percent_semi_abs = 0.125 #The proportion of the blade that can absorb some, but not many, neutrons.
 
     #INTERNAL VARS
     rad_out_central: float | None = None # Will be changed once blades are initialized
