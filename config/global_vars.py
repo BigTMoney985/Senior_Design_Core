@@ -19,7 +19,7 @@ user_opts = user_opts_class()
 @dataclass
 class reflector_class:
     be_thickness = 31 # beryllium thickness
-    water_gap = 0.5 # gap between water and beryllium
+    water_gap = 0.05 # gap between water and beryllium
 reflector = reflector_class()
 
 @dataclass
@@ -31,12 +31,12 @@ fluxtrap = fluxtrap_class()
 @dataclass
 class fuel_class:
     temp_var: float = 1.0
-    meat_thickness: float = 0.13 # Thickness of the fuel meat in cm
+    meat_thickness: float = 0.15 # Thickness of the fuel meat in cm
     clad_thickness: float = in_to_cm(0.015) #thickness of the clad
     nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
     fuel_inner: float = 4 # Inner radius of the fuel element
     plate_num: int = 30 #number of fuel plates in the fuel element
-    height: float = 120 # How tall the elements are?
+    height: float = 150 # How tall the elements are?
 
     #PLACEHOLDER VALUE ============
     fuel_outer: float = 67
@@ -64,8 +64,8 @@ class graveyard_class:
 
     def __init__(self):
         grave_cyl = openmc.ZCylinder(r=self.graveyard_r, boundary_type='reflective')
-        grave_top = openmc.ZPlane(z0=fuel.height, boundary_type='vacuum')
-        grave_bot = openmc.ZPlane(z0=0, boundary_type='vacuum')
+        grave_top = openmc.ZPlane(z0=fuel.height, boundary_type='reflective')
+        grave_bot = openmc.ZPlane(z0=0, boundary_type='reflective')
 
         self.graveyard_region = -grave_cyl & +grave_bot & -grave_top
 graveyard = graveyard_class()

@@ -49,6 +49,11 @@ if gv.user_opts.run_mode == 'plot':
     openmc.plot_geometry()
 
 else:
+    # TALLIES =================================
+    material_filter = openmc.MaterialFilter([material_dict['water'].id, material_dict['fuel'].id, material_dict['aluminum'].id])
+    tally = openmc.Tally()
+    tally.filters = [material_filter]
+    
     bounds = [-20, -20, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
 

@@ -2,10 +2,12 @@ import openmc
 import config.global_vars as gv
 from geometry.fuel_ring import FuelRingGeometry
 from geometry.surrounding_water import WaterGeometry
+from geometry.central_reflector import be_reflector
 
 def create_geometry():
     fuel_ring_geometry = FuelRingGeometry()
     water_geom = WaterGeometry()
+    be_geom = be_reflector()
 
     # Create shared boundary cylinders
     inner_cyl, outer_cyl = water_geom.create_surfaces()
@@ -20,8 +22,14 @@ def create_geometry():
         region=+inner_cyl & -outer_cyl & gv.graveyard.graveyard_region
     )
 
-    # 3. Assemble root universe
-    root_universe = openmc.Universe(cells=water_cells + [ring_cell])
+    # 3. Be reflector region
+    inner_cyl, outer_cyl = be_geom.create_surfaces()
+    be_cell = be_geom.create_be_cells(inner_cyl, outer_cyl)
+
+    water_cells[1].region = water_cells[1].region & ~(be_cell.region) #type: ignore
+
+    # 4. Assemble root universe
+    root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell])
     root_geometry = openmc.Geometry(root=root_universe)
     root_geometry.export_to_xml()
 

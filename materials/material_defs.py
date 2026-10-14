@@ -106,7 +106,7 @@ def create_materials(mat_choice: str):
 
         fuel = openmc.Material.mix_materials([u3si2, aluminum], fracs=[0.52, 0.48], percent_type='wo')
         fuel.set_density('g/cm3', 11.8)
-        fuel.add_s_alpha_beta('c_Al27')
+        #fuel.add_s_alpha_beta('c_Al27')
 
     elif mat_choice.lower() == 'u3o8':
         # U3O8

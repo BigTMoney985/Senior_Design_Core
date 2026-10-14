@@ -22,7 +22,7 @@ class be_reflector:
             region=+inner_cyl & -outer_cyl & gv.graveyard.graveyard_region
         )
 
-        return [outer_cell]
+        return outer_cell
 
 
 

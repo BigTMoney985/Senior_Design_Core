@@ -189,6 +189,5 @@
     <nuclide name="Cr52" ao="0.0007439155669853567"/>
     <nuclide name="Cr53" ao="8.435405365773403e-05"/>
     <nuclide name="Cr54" ao="2.099750940959278e-05"/>
-    <sab name="c_Al27"/>
   </material>
 </materials>
