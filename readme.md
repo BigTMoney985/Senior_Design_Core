@@ -7,5 +7,5 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 - [ ] Maybe make an input yaml?
 - [x] Get the ring fully made for the fuel elements.
 - [ ] Add a separate plotter.py file
-- [ ] Add heights to fuel and water
-
+- [x] Add heights to fuel and water
+- [ ] Add proper material definitions to the control rods
