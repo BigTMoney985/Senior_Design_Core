@@ -67,6 +67,12 @@ class materials_class:
     def set_materials(self, material_dict: dict) -> None:
         """Set the material dictionary."""
         self.material_dict = material_dict
+
+    def get_materials(self):
+        if self.material_dict is None:
+            raise ValueError('Material Dict is not assigned')
+        else:
+            return self.material_dict
 materials = materials_class()
 
 @dataclass

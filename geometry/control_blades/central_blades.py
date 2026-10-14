@@ -20,6 +20,12 @@ class central_blades:
         #Allocation
         self.surface_dict = None
 
+        #Material definition
+        material_dict = gv.materials.get_materials()
+
+        self.water = material_dict['water']
+        self.aluminum = material_dict['aluminum']
+
         gv.control_blade.rad_out_central = self.r_out
     def create_surfaces(self):
 
@@ -70,18 +76,18 @@ class central_blades:
 
         inner_blade.append(openmc.Cell(
             name='blade universe water below',
-            fill=None,
+            fill=self.water,
             region=inner_blade_cyl_reg & -self.surface_dict['bottom']
         ))
         inner_blade.append(openmc.Cell(
             name='blade universe water above',
-            fill=None,
+            fill=self.water,
             region=inner_blade_cyl_reg & +self.surface_dict['top']
         ))
 
         inner_blade.append(openmc.Cell(
             name='central blade transparent section',
-            fill=None,
+            fill=self.aluminum,
             region=(inner_blade_cyl_reg & -self.surface_dict['top'] & +self.surface_dict['semi_end'])
         ))
         inner_blade.append(openmc.Cell(
@@ -105,12 +111,12 @@ class central_blades:
 
             below_water = openmc.Cell(
                 name=f'outer blade {i+1} universe water below',
-                fill=None,
+                fill=self.water,
                 region=outer_blade_cyl_reg & -self.surface_dict['bottom'] & wedge_region
             )
             above_water = openmc.Cell(
                 name=f'outer blade {i+1} universe water above',
-                fill=None,
+                fill=self.water,
                 region=outer_blade_cyl_reg & +self.surface_dict['top'] & wedge_region
             )
             
@@ -126,7 +132,7 @@ class central_blades:
             )
             outer_transparent = openmc.Cell(
                 name=f'outer central blade {i+1} transparent section',
-                fill=None,
+                fill=self.aluminum,
                 region=(outer_blade_cyl_reg & -self.surface_dict['semi_start'] & +self.surface_dict['bottom'] & wedge_region)
             )
             outer_blades.append([below_water, above_water, outer_poison, outer_semi, outer_transparent])
