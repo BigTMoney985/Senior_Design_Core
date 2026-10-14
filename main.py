@@ -10,42 +10,59 @@ from geometry.model import create_geometry
 material_dict = create_materials(gv.user_opts.fuel_choice)
 geom = create_geometry()
 
-# PLOTTING THE FUEL ELEMENT GEOMETRY
-plot = openmc.Plot()
-#plot.show_overlaps = True
-#plot.overlap_color = 'orange'
-plot.basis = 'xy'
-plot.origin = (0, 0, 10)
-plot.width = (40, 40)
-plot.pixels = (2160, 2160)
-plot.color_by = 'material'
+if gv.user_opts.run_mode == 'plot':
+    # PLOTTING THE FUEL ELEMENT GEOMETRY
+    plot = openmc.Plot()
+    #plot.show_overlaps = True
+    #plot.overlap_color = 'orange'
+    plot.basis = 'xy'
+    plot.origin = (0, 0, 10)
+    plot.width = (40, 40)
+    plot.pixels = (2160, 2160)
+    plot.color_by = 'material'
 
-# This part is to set the colors for each material in the plot.
+    # This part is to set the colors for each material in the plot.
 
-if material_dict is not None:
-    # I havent fixed the material colors yet lol
-    color_map = {
-        'aluminum': 'lightgray',
-        'ss_304': 'darkgray',
-        'ss_304L': 'dimgray',
-        'concrete': 'lightblue',
-        'air': 'white',
-        'be_metal': 'lightyellow',
-        'graphite': 'black',
-        'boron': 'green',
-        'borated_ss306': 'darkgreen',
-        'fuel': 'red',
-        'water': 'blue',
-        'zr_barrier': 'orange'
-    }
+    if material_dict is not None:
+        # I havent fixed the material colors yet lol
+        color_map = {
+            'aluminum': 'lightgray',
+            'ss_304': 'darkgray',
+            'ss_304L': 'dimgray',
+            'concrete': 'lightblue',
+            'air': 'white',
+            'be_metal': 'lightyellow',
+            'graphite': 'black',
+            'boron': 'green',
+            'borated_ss306': 'darkgreen',
+            'fuel': 'red',
+            'water': 'blue',
+            'zr_barrier': 'orange'
+        }
 
-    plot.colors = {material_dict[name]: color for name, color in color_map.items() if name in material_dict}
+        plot.colors = {material_dict[name]: color for name, color in color_map.items() if name in material_dict}
 
 
-plots = openmc.Plots([plot])
-plots.export_to_xml()
+    plots = openmc.Plots([plot])
+    plots.export_to_xml()
 
-openmc.plot_geometry()
+    openmc.plot_geometry()
+
+else:
+    bounds = [-40, -40, 0, 40, 40, 120,]
+    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
+
+    settings = openmc.Settings(
+        run_mode = 'eigenvalue',
+        particles = int(1e4),
+        batches = 150,
+        inactive = 10,
+        source = openmc.IndependentSource(space=uniform_dist),
+        output = {'tallies': False},
+    )
+    settings.export_to_xml()
+
+    openmc.run()
 
 
 
