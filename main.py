@@ -16,7 +16,7 @@ if gv.user_opts.run_mode == 'plot':
     #plot.show_overlaps = True
     #plot.overlap_color = 'orange'
     plot.basis = 'xy'
-    plot.origin = (0, 0, 10)
+    plot.origin = (0, 0, 140)
     plot.width = (40, 40)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
@@ -31,7 +31,7 @@ if gv.user_opts.run_mode == 'plot':
             'ss_304L': 'dimgray',
             'concrete': 'lightblue',
             'air': 'white',
-            'be_metal': 'lightyellow',
+            'be_metal': 'brown',
             'graphite': 'black',
             'boron': 'green',
             'borated_ss306': 'darkgreen',
