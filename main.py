@@ -34,7 +34,7 @@ if gv.user_opts.run_mode == 'plot':
             'be_metal': 'lightyellow',
             'graphite': 'black',
             'boron': 'green',
-            'borated_ss306': 'darkgreen',
+            'b4c': 'darkgreen',
             'fuel': 'red',
             'water': 'blue',
             'zr_barrier': 'orange'

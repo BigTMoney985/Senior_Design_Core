@@ -10,6 +10,7 @@ def in_to_cm(inches: float) -> float:
     """Convert inches to centimeters."""
     return inches * 2.54
 
+# ==================== USER OPTIONS ====================
 @dataclass
 class user_opts_class:
     run_mode: str = 'plot'  # Default run mode is 'plot'
@@ -19,8 +20,14 @@ user_opts = user_opts_class()
 @dataclass
 class reflector_class:
     be_thickness = 31 # beryllium thickness
-    water_gap = 0.05 # gap between water and beryllium
+    water_gap = 0.05 # gap dist of water between control element and fuel or reflector
 reflector = reflector_class()
+
+@dataclass
+class control_blade_class:
+    blade_thickness = 0.25 # Thickness of each blade, central blades are two in series, so thickness will be double
+    central_blade_num = 6 #number of blades in the central area
+control_blade = control_blade_class()
 
 @dataclass
 class fluxtrap_class:

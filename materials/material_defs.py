@@ -92,8 +92,11 @@ def create_materials(mat_choice: str):
     boron.add_element('B', 1)
     boron.set_density('g/cm3', 2.34)
 
-    # Borinated SS306
-    borated_ss306 = openmc.Material.mix_materials([ss_304, boron], fracs=[0.98, 0.02], percent_type='wo')
+    # Boron Carbide
+    b4c = openmc.Material(name='Boron Carbide')
+    b4c.add_element('B', 4)
+    b4c.add_element('C', 1)
+    b4c.set_density('g/cm3', 2.5)
 
     #==============================FUEL CANDIDATES===============================
 
@@ -139,7 +142,7 @@ def create_materials(mat_choice: str):
         'be_metal': be_metal,
         'graphite': graphite,
         'boron': boron,
-        'borated_ss306': borated_ss306,
+        'b4c': b4c,
         'fuel': fuel,
         'water': water,
         'zr_barrier': zr_barrier,
