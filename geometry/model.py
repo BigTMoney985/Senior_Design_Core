@@ -8,7 +8,7 @@ from geometry.control_blades.central_blades import central_blades_cl
 def create_geometry():
     fuel_ring_geometry = FuelRingGeometry()
     water_geom = WaterGeometry()
-    be_geom = be_reflector()
+    control_blades = central_blades_cl()
 
     # Create shared boundary cylinders
     inner_cyl, outer_cyl = water_geom.create_surfaces()
@@ -24,14 +24,13 @@ def create_geometry():
     )
 
     # 3. Be reflector region
+    be_geom = be_reflector() # This has to be here or the code breaks
     inner_cyl, outer_cyl = be_geom.create_surfaces()
     be_cell = be_geom.create_be_cells(inner_cyl, outer_cyl)
 
     water_cells[1].region = water_cells[1].region & ~(be_cell.region) #type: ignore
 
     # 4 Control blade region
-    
-    control_blades = central_blades_cl()
 
     control_blades_cell = control_blades.create_channel_cell([gv.fuel.height, 0, 0, 0, 0, 0, 0,])
 
