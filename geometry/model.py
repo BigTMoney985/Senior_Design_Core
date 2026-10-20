@@ -3,6 +3,7 @@ import config.global_vars as gv
 from geometry.fuel_ring import FuelRingGeometry
 from geometry.surrounding_water import WaterGeometry
 from geometry.central_reflector import be_reflector
+from geometry.control_blades.central_blades import central_blades_cl
 
 def create_geometry():
     fuel_ring_geometry = FuelRingGeometry()
@@ -29,9 +30,13 @@ def create_geometry():
     water_cells[1].region = water_cells[1].region & ~(be_cell.region) #type: ignore
 
     # 4 Control blade region
+    
+    control_blades = central_blades_cl()
 
-    # 4. Assemble root universe
-    root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell])
+    control_blades_cell = control_blades.create_channel_cell([gv.fuel.height, 0, 0, 0, 0, 0, 0,])
+
+    # 5. Assemble root universe
+    root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell] + [control_blades_cell])
     root_geometry = openmc.Geometry(root=root_universe)
     root_geometry.export_to_xml()
 

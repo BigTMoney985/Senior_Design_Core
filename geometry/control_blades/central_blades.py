@@ -2,7 +2,7 @@ import openmc
 import numpy as np
 import config.global_vars as gv
 
-class central_blades:
+class central_blades_cl:
     def __init__(self) -> None:
         self.r_inner = gv.reflector.water_gap + gv.fuel.fuel_outer
         self.r_midpoint = self.r_inner + gv.control_blade.blade_thickness
