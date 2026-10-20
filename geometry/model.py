@@ -32,10 +32,10 @@ def create_geometry():
 
     # 4 Control blade region
 
-    control_blades_cell = control_blades.create_channel_cell([gv.fuel.height, 0, 0, 0, 0, 0, 0,])
+    control_blades_cell = control_blades.create_channel_cell([gv.fuel.height, 67, 0, 0, 0, 0, 0,])
 
     # 5. Assemble root universe
-    root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell] + [control_blades_cell])
+    root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell] + control_blades_cell)
     root_geometry = openmc.Geometry(root=root_universe)
     root_geometry.export_to_xml()
 
