@@ -15,9 +15,9 @@ if gv.user_opts.run_mode == 'plot':
     plot = openmc.Plot()
     #plot.show_overlaps = True
     #plot.overlap_color = 'orange'
-    plot.basis = 'xy'
-    plot.origin = (0, 0, 140)
-    plot.width = (35, 35)
+    plot.basis = 'xz'
+    plot.origin = (0, 0, 75)
+    plot.width = (35, 100)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
 
