@@ -7,10 +7,22 @@ class WaterGeometry:
         self.r_outer = gv.fuel.fuel_outer
         self.water_mat = gv.materials.material_dict['water'] # type: ignore
 
+        self.control_in = gv.control_blade.rad_in_central
+        self.control_out = gv.control_blade.rad_out_central
+        
+
     def create_surfaces(self):
         """Surfaces shared across water and fuel boundaries."""
         inner_cyl = openmc.ZCylinder(r=self.r_central)
         outer_cyl = openmc.ZCylinder(r=self.r_outer)
+        fuel_outer = openmc.ZCylinder(r=gv.fuel.fuel_outer)
+
+        control_inner = openmc.ZCylinder(r=self.control_in) #type: ignore
+        control_outer = openmc.ZCylinder(r=self.control_out) #type: ignore
+
+        be_in = openmc.ZCylinder(r=gv.reflector.r_inner) #type: ignore
+        be_out = openmc.ZCylinder(r=gv.reflector.r_outer) #type: ignore
+
         return inner_cyl, outer_cyl
 
     def create_water_cells(self, inner_cyl, outer_cyl):
@@ -23,7 +35,7 @@ class WaterGeometry:
 
         # 2. Outside water reflector up to the graveyard boundary
         outer_cell = openmc.Cell(
-            name="outer_water",
+            name="water_before_control",
             fill=self.water_mat,
             region=+outer_cyl & gv.graveyard.graveyard_region
         )

@@ -28,6 +28,7 @@ class central_blades_cl:
         self.ss304 = material_dict['ss_304']
         self.aluminum = material_dict['aluminum']
 
+        gv.control_blade.rad_in_central = self.r_inner
         gv.control_blade.rad_out_central = self.r_out
     def create_surfaces(self):
 

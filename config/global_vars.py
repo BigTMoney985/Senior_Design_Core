@@ -21,6 +21,10 @@ user_opts = user_opts_class()
 class reflector_class:
     be_thickness = 31 # beryllium thickness
     water_gap = 0.05 # gap dist of water between control element and fuel or reflector
+
+    #INTERNAL VARS
+    r_inner: float | None = None
+    r_outer: float | None = None
 reflector = reflector_class()
 
 @dataclass
@@ -31,6 +35,7 @@ class control_blade_class:
 
     #INTERNAL VARS
     rad_out_central: float | None = None # Will be changed once blades are initialized
+    rad_in_central: float | None = None # radius of the control blades inner
 control_blade = control_blade_class()
 
 @dataclass

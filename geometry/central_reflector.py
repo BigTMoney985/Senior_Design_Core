@@ -8,6 +8,9 @@ class be_reflector:
         self.r_outer = self.r_inner + gv.reflector.be_thickness
         self.be_met = gv.materials.material_dict['be_metal'] # type: ignore
 
+        gv.reflector.r_inner = self.r_inner
+        gv.reflector.r_outer = self.r_outer
+
     def create_surfaces(self):
         """Surfaces shared across water and fuel boundaries."""
         inner_cyl = openmc.ZCylinder(r=self.r_inner)
