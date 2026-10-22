@@ -13,7 +13,7 @@ def in_to_cm(inches: float) -> float:
 # ==================== USER OPTIONS ====================
 @dataclass
 class user_opts_class:
-    run_mode: str = 'plot'  # Default run mode is 'plot'
+    run_mode: str = 'eigenvalue'  # Default run mode is 'plot'
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
 user_opts = user_opts_class()
 
