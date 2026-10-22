@@ -33,7 +33,10 @@ def create_geometry():
     
     # Curent full withdrawal for main central blade is -162.5, with full insertion of it being 0.
     # Current full withdrawal for all other is 0, with full insertion at -162.5 (-150 * 1.125)
-    control_blades_cell = control_blades.create_channel_cell([-162.50, 0, 0, 0, 0, 0, 0,])
+    #control_blades_cell = control_blades.create_channel_cell([-162.5, 0, 0, 0, 0, 0, 0,])
+
+    # Full Out Outer PRESET ==========
+    control_blades_cell = control_blades.create_channel_cell([-162.5] * 5 + [0, 0])
 
     
 
