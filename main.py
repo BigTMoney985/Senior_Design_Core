@@ -15,10 +15,10 @@ if gv.user_opts.run_mode == 'plot':
     plot = openmc.Plot()
     #plot.show_overlaps = True
     #plot.overlap_color = 'orange'
-    plot.basis = 'xz'
-    plot.origin = (0, 0, 75)
-    plot.width = (35, 200)
-    plot.pixels = (2160, 5000)
+    plot.basis = 'xy'
+    plot.origin = (6, 6, 75)
+    plot.width = (10, 10)
+    plot.pixels = (2160, 2160)
     plot.color_by = 'material'
 
     # This part is to set the colors for each material in the plot.
@@ -44,9 +44,20 @@ if gv.user_opts.run_mode == 'plot':
 
 
     plots = openmc.Plots([plot])
-    plots.export_to_xml()
+    # plots.export_to_xml()
+    # geom.export_to_xml()
+    # materials.export_to_xml()
 
-    openmc.plot_geometry()
+    model = openmc.Model(
+        geometry=geom,
+        materials=materials,
+        plots=plots
+    )
+        
+
+    model.plot_geometry()
+
+
 
 else:
     # TALLIES =================================
