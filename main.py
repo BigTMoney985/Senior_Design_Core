@@ -6,57 +6,66 @@ from config import global_vars as gv
 from materials.material_defs import create_materials
 # from geometry.fuel_ring import FuelRingGeometry
 from geometry.model import create_geometry
+import matplotlib.patches as mpatches
 
 material_dict, materials = create_materials(gv.user_opts.fuel_choice)
 geom = create_geometry()
 
 if gv.user_opts.run_mode == 'plot':
-    # PLOTTING THE FUEL ELEMENT GEOMETRY
     plot = openmc.Plot()
-    #plot.show_overlaps = True
-    #plot.overlap_color = 'orange'
+    plot.filename = 'plot_1'
     plot.basis = 'xy'
     plot.origin = (6, 6, 75)
     plot.width = (10, 10)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
 
-    # This part is to set the colors for each material in the plot.
+    color_map = {
+        'aluminum': 'lightgray',
+        #'ss_304': 'darkgray',
+        #'ss_304L': 'dimgray',
+        #'concrete': 'lightblue',
+        #'air': 'white',
+        'be_metal': 'lightyellow',
+        #'graphite': 'black',
+        #'boron': 'green',
+        'b4c': 'darkgreen',
+        'fuel': 'red',
+        'water': 'blue',
+        #'zr_barrier': 'orange'
+    }
 
+    # Map actual openmc.Material objects to colors
     if material_dict is not None:
-        # I havent fixed the material colors yet lol
-        color_map = {
-            'aluminum': 'lightgray',
-            'ss_304': 'darkgray',
-            'ss_304L': 'dimgray',
-            'concrete': 'lightblue',
-            'air': 'white',
-            'be_metal': 'lightyellow',
-            'graphite': 'black',
-            'boron': 'green',
-            'b4c': 'darkgreen',
-            'fuel': 'red',
-            'water': 'blue',
-            'zr_barrier': 'orange'
+        plot.colors = {
+            material_dict[name]: color 
+            for name, color in color_map.items() 
+            if name in material_dict
         }
 
-        plot.colors = {material_dict[name]: color for name, color in color_map.items() if name in material_dict}
-
-
     plots = openmc.Plots([plot])
-    # plots.export_to_xml()
-    # geom.export_to_xml()
-    # materials.export_to_xml()
-
-    model = openmc.Model(
-        geometry=geom,
-        materials=materials,
-        plots=plots
-    )
-        
-
+    model = openmc.Model(geometry=geom, materials=materials, plots=plots)
     model.plot_geometry()
 
+    # Load rendered image
+    img = plt.imread(f'{plot.filename}.png')
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    ax.imshow(img)
+
+    # Build legend patches directly using color strings and material names
+    patches = [
+        mpatches.Patch(
+            color=color,
+            label=mat.name
+        )
+        for mat, color in plot.colors.items()
+    ]
+
+    ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.axis('off')
+    plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
+    plt.close()
 
 
 else:
