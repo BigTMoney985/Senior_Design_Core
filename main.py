@@ -15,8 +15,8 @@ if gv.user_opts.run_mode == 'plot':
     plot = openmc.Plot()
     plot.filename = 'plot_1'
     plot.basis = 'xy'
-    plot.origin = (6, 6, 75)
-    plot.width = (10, 10)
+    plot.origin = (0, 0, 75)
+    plot.width = (26, 26)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
 
@@ -43,29 +43,32 @@ if gv.user_opts.run_mode == 'plot':
             if name in material_dict
         }
 
+    print(gv.fuel.fuel_outer)
     plots = openmc.Plots([plot])
     model = openmc.Model(geometry=geom, materials=materials, plots=plots)
     model.plot_geometry()
 
-    # Load rendered image
-    img = plt.imread(f'{plot.filename}.png')
+    if gv.user_opts.legend:
 
-    fig, ax = plt.subplots(figsize=(10, 8))
-    ax.imshow(img)
+        # Load rendered image
+        img = plt.imread(f'{plot.filename}.png')
 
-    # Build legend patches directly using color strings and material names
-    patches = [
-        mpatches.Patch(
-            color=color,
-            label=mat.name
-        )
-        for mat, color in plot.colors.items()
-    ]
+        fig, ax = plt.subplots(figsize=(10, 8))
+        ax.imshow(img)
 
-    ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.axis('off')
-    plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
-    plt.close()
+        # Build legend patches directly using color strings and material names
+        patches = [
+            mpatches.Patch(
+                color=color,
+                label=mat.name
+            )
+            for mat, color in plot.colors.items()
+        ]
+
+        ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.axis('off')
+        plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
+        plt.close()
 
 
 else:
