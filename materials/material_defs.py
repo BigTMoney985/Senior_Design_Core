@@ -149,12 +149,12 @@ def create_materials(mat_choice: str):
     }
 
     materials = openmc.Materials(list(materials_dict.values()))
-    materials.export_to_xml()
+    #materials.export_to_xml()   |  NOT NEEDED SINCE MODEL PULLS THE VALUES ANYWAY
 
     
     gv.materials.set_materials(material_dict=materials_dict)  # Store the materials dictionary in global_vars
 
-    return materials_dict
+    return materials_dict, materials
 
 
 def u_gcc(fuel):

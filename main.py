@@ -7,7 +7,7 @@ from materials.material_defs import create_materials
 # from geometry.fuel_ring import FuelRingGeometry
 from geometry.model import create_geometry
 
-material_dict = create_materials(gv.user_opts.fuel_choice)
+material_dict, materials = create_materials(gv.user_opts.fuel_choice)
 geom = create_geometry()
 
 if gv.user_opts.run_mode == 'plot':
@@ -71,7 +71,8 @@ else:
 
     tallies.append(fuel_therm_abs_rate)
 
-    tallies.export_to_xml()
+    # tallies.export_to_xml()
+
     
     bounds = [-20, -20, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
@@ -84,9 +85,20 @@ else:
         source = openmc.IndependentSource(space=uniform_dist),
         output = {'tallies': True},
     )
-    settings.export_to_xml()
 
-    openmc.run()
+    # REACTOR KINETICS PARAMATERS FINDING ========================
+    settings.ifp_n_generation = 10
+
+    model = openmc.Model(
+        geometry=geom,
+        materials=materials,
+        settings=settings,
+    )
+    model.add_kinetics_parameters_tallies(num_groups=6)
+
+    model.export_to_model_xml()
+
+    model.run()
 
 
 

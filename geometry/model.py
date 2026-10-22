@@ -40,6 +40,6 @@ def create_geometry():
     # 5. Assemble root universe
     root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell] + control_blades_cell)
     root_geometry = openmc.Geometry(root=root_universe)
-    root_geometry.export_to_xml()
+    #root_geometry.export_to_xml()   |   NOT NEEDED SINCE GEOMETRY IS PULLED
 
     return root_geometry
