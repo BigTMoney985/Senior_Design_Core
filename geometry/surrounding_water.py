@@ -9,6 +9,9 @@ class WaterGeometry:
 
         self.control_in = gv.control_blade.rad_in_central
         self.control_out = gv.control_blade.rad_out_central
+
+        self.fuel_top = openmc.ZPlane(z0=gv.fuel.height)
+        self.fuel_bot = openmc.ZPlane(z0=0)
         
 
     def create_surfaces(self):
@@ -63,6 +66,43 @@ class WaterGeometry:
         )
 
         return [central_cell, in_blade_cell, out_blade_cell, out_be_cell]
+
+    def create_water_cells_around(self, surf_dict):
+        # 5. Above fuel
+        above_fuel_cell = openmc.Cell(
+            name='above_central fuel water',
+            fill=self.water_mat,
+            region=+surf_dict['inner_cyl'] & -surf_dict['outer_cyl'] & +self.fuel_top & gv.graveyard.graveyard_region
+        )
+        # 6. Below fuel
+        below_fuel_cell = openmc.Cell(
+            name='below_central fuel water',
+            fill=self.water_mat,
+            region=+surf_dict['inner_cyl'] & -surf_dict['outer_cyl'] & -self.fuel_bot & gv.graveyard.graveyard_region
+        )
+
+        # 7. Above reflector
+        above_be_cell = openmc.Cell(
+            name='above central be water',
+            fill=self.water_mat,
+            region=+surf_dict['be_in'] & -surf_dict['be_out'] & +self.fuel_top & gv.graveyard.graveyard_region
+        )
+
+        # 8. Below reflector
+        below_be_cell = openmc.Cell(
+            name='below central be water',
+            fill=self.water_mat,
+            region=+surf_dict['be_in'] & -surf_dict['be_out'] & -self.fuel_bot & gv.graveyard.graveyard_region
+        )
+
+        # 9. Outside reflector
+        outside_be_cell = openmc.Cell(
+            name='outside central be water',
+            fill=self.water_mat,
+            region=+surf_dict['be_out'] & gv.graveyard.graveyard_region
+        )
+
+        return [above_be_cell, below_be_cell, outside_be_cell, above_fuel_cell, below_fuel_cell]
         
 
 

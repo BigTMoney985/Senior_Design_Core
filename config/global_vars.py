@@ -86,10 +86,14 @@ class graveyard_class:
 
     def __init__(self):
         grave_cyl = openmc.ZCylinder(r=self.graveyard_r, boundary_type='vacuum')
-        grave_top = openmc.ZPlane(z0=fuel.height, boundary_type='vacuum')
-        grave_bot = openmc.ZPlane(z0=0, boundary_type='vacuum')
+        grave_top = openmc.ZPlane(z0=(2*fuel.height), boundary_type='vacuum')
+        grave_bot = openmc.ZPlane(z0=-fuel.height, boundary_type='vacuum')
+
+        fueled_top = openmc.ZPlane(z0=(fuel.height), boundary_type='vacuum')
+        fueled_bot = openmc.ZPlane(z0=0, boundary_type='vacuum')
 
         self.graveyard_region = -grave_cyl & +grave_bot & -grave_top
+        self.fueled_region = -fueled_top & +fueled_bot & -grave_cyl
 graveyard = graveyard_class()
 
 

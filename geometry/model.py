@@ -16,6 +16,7 @@ def create_geometry():
 
     # 1. Water cells (central cavity + outer reflector)
     water_cells = water_geom.create_water_cells_inner(surf_dict)
+    water_cells += water_geom.create_water_cells_around(surf_dict)
 
     # 2. Fuel ring cell (bounded strictly to the annular space)
     ring_cell = openmc.Cell(

@@ -1,6 +1,6 @@
 import openmc 
 import numpy as np
-from config.global_vars import fuel, fluxtrap, element_ring_class, element_cell_class
+from config.global_vars import fuel, fluxtrap, element_ring_class, element_cell_class, graveyard
 #from materials.material_defs import create_materials
 from geometry.fuel_element import FuelElementGeometry
 
@@ -32,7 +32,7 @@ class FuelRingGeometry:
             p2 = openmc.Plane(a=-np.sin(t2), b=np.cos(t2), c=0.0, d=0.0)
 
             # Wedge between angle_start and angle_end within the radial boundaries
-            wedge_region = +self.r_in & -self.r_out & +p1 & -p2
+            wedge_region = +self.r_in & -self.r_out & +p1 & -p2 & graveyard.fueled_region
 
             # Cell filling this sector with rotated base_universe
             wedge_cell = openmc.Cell(

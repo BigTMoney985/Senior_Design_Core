@@ -4,9 +4,8 @@
     <density value="1.0" units="g/cm3"/>
     <nuclide name="H1" ao="1.99968852"/>
     <nuclide name="H2" ao="0.00031148"/>
-    <nuclide name="O16" ao="0.9976206"/>
+    <nuclide name="O16" ao="0.999621"/>
     <nuclide name="O17" ao="0.000379"/>
-    <nuclide name="O18" ao="0.0020004"/>
     <sab name="c_H_in_H2O"/>
   </material>
   <material id="2" name="Al-6061">
@@ -59,8 +58,7 @@
     <nuclide name="Si28" wo="0.009187351728283676"/>
     <nuclide name="Si29" wo="0.0004831750292786396"/>
     <nuclide name="Si30" wo="0.00032947324243768423"/>
-    <nuclide name="C12" wo="0.0009880068450856866"/>
-    <nuclide name="C13" wo="1.1993154914313475e-05"/>
+    <nuclide name="C0" wo="0.001"/>
   </material>
   <material id="4" name="SS-304L">
     <density value="8.0" units="g/cm3"/>
@@ -81,8 +79,7 @@
     <nuclide name="Si28" wo="0.009187351728283676"/>
     <nuclide name="Si29" wo="0.0004831750292786396"/>
     <nuclide name="Si30" wo="0.00032947324243768423"/>
-    <nuclide name="C12" wo="0.0004940034225428433"/>
-    <nuclide name="C13" wo="5.996577457156738e-06"/>
+    <nuclide name="C0" wo="0.0005"/>
   </material>
   <material id="5" name="Zr Barrier">
     <density value="6.52" units="g/cm3"/>
@@ -94,9 +91,8 @@
   </material>
   <material id="6" name="Concrete">
     <density value="2.3" units="g/cm3"/>
-    <nuclide name="O16" wo="0.5285938425889992"/>
-    <nuclide name="O17" wo="0.0002134227518356162"/>
-    <nuclide name="O18" wo="0.0011927346591651545"/>
+    <nuclide name="O16" wo="0.5297865237528052"/>
+    <nuclide name="O17" wo="0.0002134762471948716"/>
     <nuclide name="Si28" wo="0.3031826070333613"/>
     <nuclide name="Si29" wo="0.015944775966195108"/>
     <nuclide name="Si30" wo="0.01087261700044358"/>
@@ -116,9 +112,8 @@
     <density value="0.001225" units="g/cm3"/>
     <nuclide name="N14" wo="0.7769402263812506"/>
     <nuclide name="N15" wo="0.0030597736187493877"/>
-    <nuclide name="O16" wo="0.2094428432899808"/>
-    <nuclide name="O17" wo="8.456373185939509e-05"/>
-    <nuclide name="O18" wo="0.00047259297815977814"/>
+    <nuclide name="O16" wo="0.2099154150718662"/>
+    <nuclide name="O17" wo="8.458492813381704e-05"/>
     <nuclide name="Ar36" wo="3.0036130849015778e-05"/>
     <nuclide name="Ar38" wo="5.977440397658353e-06"/>
     <nuclide name="Ar40" wo="0.009963986428753327"/>
@@ -130,8 +125,7 @@
   </material>
   <material id="9" name="Graphite">
     <density value="1.7" units="g/cm3"/>
-    <nuclide name="C12" ao="0.988922"/>
-    <nuclide name="C13" ao="0.011078"/>
+    <nuclide name="C0" ao="1.0"/>
     <sab name="c_Graphite"/>
   </material>
   <material id="10" name="Boron">
@@ -143,8 +137,7 @@
     <density value="2.5" units="g/cm3"/>
     <nuclide name="B10" ao="0.7928"/>
     <nuclide name="B11" ao="3.2072"/>
-    <nuclide name="C12" ao="0.988922"/>
-    <nuclide name="C13" ao="0.011078"/>
+    <nuclide name="C0" ao="1.0"/>
   </material>
   <material id="13" name="U3Si2(0.52)-Al-6061(0.48)" depletable="true">
     <density value="11.8" units="g/cm3"/>

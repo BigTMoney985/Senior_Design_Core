@@ -17,8 +17,8 @@ if gv.user_opts.run_mode == 'plot':
     #plot.overlap_color = 'orange'
     plot.basis = 'xz'
     plot.origin = (0, 0, 75)
-    plot.width = (35, 100)
-    plot.pixels = (2160, 2160)
+    plot.width = (35, 200)
+    plot.pixels = (2160, 5000)
     plot.color_by = 'material'
 
     # This part is to set the colors for each material in the plot.

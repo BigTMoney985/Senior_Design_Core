@@ -23,7 +23,7 @@ class be_reflector:
         outer_cell = openmc.Cell(
             name="be_reflector",
             fill=self.be_met,
-            region=+inner_cyl & -outer_cyl & gv.graveyard.graveyard_region
+            region=+inner_cyl & -outer_cyl & gv.graveyard.fueled_region
         )
 
         return outer_cell
