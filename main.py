@@ -97,7 +97,7 @@ else:
     # tallies.export_to_xml()
 
     
-    bounds = [-20, -20, 0, 20, 20, 120,]
+    bounds = [-12, -12, 0, 20, 20, 120,]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
 
     settings = openmc.Settings(

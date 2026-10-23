@@ -13,7 +13,7 @@ def in_to_cm(inches: float) -> float:
 # ==================== USER OPTIONS ====================
 @dataclass
 class user_opts_class:
-    run_mode: str = 'plot'  # Default run mode is 'plot'
+    run_mode: str = 'eigenvalue'  # Default run mode is 'plot'
     legend: bool = True # Has Materials Legend on the plot
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
 user_opts = user_opts_class()
@@ -48,11 +48,11 @@ fluxtrap = fluxtrap_class()
 @dataclass
 class fuel_class:
     temp_var: float = 1.0
-    meat_thickness: float = 0.13 # Thickness of the fuel meat in cm
+    meat_thickness: float = 0.08 # Thickness of the fuel meat in cm
     clad_thickness: float = in_to_cm(0.015) #thickness of the clad
-    nominal_dist: float = 0.15 #Distance between the outer clad of one plate and the inner clad of the next plate
+    nominal_dist: float = 0.09 #Distance between the outer clad of one plate and the inner clad of the next plate
     fuel_inner: float = 4 # Inner radius of the fuel element
-    plate_num: int = 24 #number of fuel plates in the fuel element
+    plate_num: int = 18 #number of fuel plates in the fuel element
     height: float = 150 # How tall the elements are?
 
     #PLACEHOLDER VALUE ============

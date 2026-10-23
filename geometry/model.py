@@ -36,7 +36,7 @@ def create_geometry():
     #control_blades_cell = control_blades.create_channel_cell([-162.5, 0, 0, 0, 0, 0, 0,])
 
     # Full Out Outer PRESET ==========
-    control_blades_cell = control_blades.create_channel_cell([-162.5] * 5 + [0, 0])
+    control_blades_cell = control_blades.create_channel_cell([-162.5] + [0] * 6)
 
     
 
