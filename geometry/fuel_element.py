@@ -66,11 +66,14 @@ class FuelElementGeometry:
         inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness = self.define_plates()
         # Creating surfaces to actually work with
 
-        materials_dict = materials.material_dict
+        materials_dict: dict[str, openmc.Material] | None = materials.material_dict
 
         if materials_dict is None:
-            materials_dict = create_materials(self.fuel_choice)
-            materials.set_materials(material_dict=materials_dict)
+            materials_dict, _ = create_materials(self.fuel_choice)
+            materials.set_materials(material_dict=materials_dict) # pyright: ignore[reportArgumentType]
+
+        if materials_dict is None:
+            raise ValueError('Materials dict is not defined')
 
         # Creating materials dictionary for the fuel, cladding, and water cells
 
