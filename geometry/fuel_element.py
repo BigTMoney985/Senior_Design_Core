@@ -1,36 +1,26 @@
+import openmc 
 import numpy as np
-import openmc
 from config.global_vars import fuel, user_opts, materials, element_cell_class
 from materials.material_defs import create_materials
 
 
 class FuelElementGeometry:
     def __init__(self):
+        # DEFINED FUEL-TYPE
         self.fuel_choice = user_opts.fuel_choice
 
-        # Angle of sector (60 degrees)
-        # Line equation: -sin(theta)*x + cos(theta)*y = 0
-        theta = np.deg2rad(60.0)
-        a_norm = -np.sin(theta)
-        b_norm = np.cos(theta)
-        # Note: sqrt(a^2 + b^2) == 1.0, so d is exact physical offset
 
-        clad_edge_thick = fuel.clad_thickness * 2.0
+        # DEFINED BOUNDARIES FOR THE FUEL ELEMENT
+        self.element_left_bound = openmc.YPlane(y0=0) #left bound of full element
+        self.fuel_left = openmc.YPlane(y0=(fuel.clad_thickness * 2)) # left bound of the fuel region.
+        self.fuel_angle = openmc.Plane(a=-2.0, b=1.0, c=0.0, d=2*fuel.clad_thickness)
+        self.element_angle = openmc.Plane(a=-2.0, b=1.0, c=0, d=0)
 
-        # Element boundary planes (Sector from 0 rad to theta rad)
-        self.element_left_bound = openmc.YPlane(y0=0.0)
-        self.element_angle = openmc.Plane(a=a_norm, b=b_norm, c=0.0, d=0.0)
+        self.outer_thickness = fuel.fuel_inner # This will be set when define_plates is called
+        self.inner_thickness = fuel.fuel_outer # This will be set when define_plates is called
 
-        # Inset planes bounding the active fuel meat & channels
-        self.fuel_left = openmc.YPlane(y0=clad_edge_thick)
-        # Shift inward into the sector (d < 0 moves the plane towards -y inside quadrant 1)
-        self.fuel_angle = openmc.Plane(a=a_norm, b=b_norm, c=0.0, d=-clad_edge_thick)
-
-        # Surfaces stored for reuse in create_fuel_cell
-        self.inner_clad_surfaces = []
-        self.outer_clad_surfaces = []
-
-        self.fuel_universe = None
+        # DEFINED UNIVERSE FOR THE FUEL ELEMENT
+        self.fuel_universe = None # This will be set when create_fuel_universe is called
 
     def get_planes(self):
         return self.element_left_bound, self.fuel_left, self.fuel_angle, self.element_angle
@@ -40,104 +30,109 @@ class FuelElementGeometry:
             raise ValueError(f"Invalid fuel choice: {self.fuel_choice}. Valid choices are: 'u3si2', 'u3o8', 'u10mo'")
         if self.fuel_choice.lower() == 'u10mo':
             raise NotImplementedError("U10Mo fuel choice is not yet implemented.")
-
+        #u10mo is not implemented because the u10mo needs a zr layer and I did not do that.
+        
         inner_clad_surfaces = []
-        inner_meat_surfaces = []
-        outer_meat_surfaces = []
-        outer_clad_surfaces = []
-
+        inner_meat_thickness = []
+        outer_meat_thickness = []
+        outer_clad_thickness = []
         for i in range(fuel.plate_num):
-            r_in_clad = fuel.fuel_inner + i * (fuel.clad_thickness * 2 + fuel.nominal_dist + fuel.meat_thickness)
-            r_in_meat = r_in_clad + fuel.clad_thickness
-            r_out_meat = r_in_meat + fuel.meat_thickness
-            r_out_clad = r_out_meat + fuel.clad_thickness
+            _in_clad_surf = fuel.fuel_inner + i * (fuel.clad_thickness * 2 + fuel.nominal_dist + fuel.meat_thickness)
+            _inner_meat_thickness = fuel.clad_thickness + _in_clad_surf
+            _outer_meat_thickness = _inner_meat_thickness + fuel.meat_thickness
+            _outer_clad_thickness = _outer_meat_thickness + fuel.clad_thickness
 
-            inner_clad_surfaces.append(openmc.ZCylinder(r=r_in_clad))
-            inner_meat_surfaces.append(openmc.ZCylinder(r=r_in_meat))
-            outer_meat_surfaces.append(openmc.ZCylinder(r=r_out_meat))
-            outer_clad_surfaces.append(openmc.ZCylinder(r=r_out_clad))
+            inner_clad_surfaces.append(openmc.ZCylinder(r=_in_clad_surf))
+            inner_meat_thickness.append(openmc.ZCylinder(r=_inner_meat_thickness))
+            outer_meat_thickness.append(openmc.ZCylinder(r=_outer_meat_thickness))
+            outer_clad_thickness.append(openmc.ZCylinder(r=_outer_clad_thickness))
 
-        self.inner_clad_surfaces = inner_clad_surfaces
-        self.outer_clad_surfaces = outer_clad_surfaces
-        fuel.fuel_outer = outer_clad_surfaces[-1].r
+            if i == fuel.plate_num - 1:
+                self.outer_thickness = _outer_clad_thickness
+                fuel.fuel_outer = self.outer_thickness
+                self.inner_thickness = inner_clad_surfaces[0].r
 
-        return inner_clad_surfaces, inner_meat_surfaces, outer_meat_surfaces, outer_clad_surfaces
+
+        return inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness
+# ==================== DEFINING PLATES ====================
+
+#surfaces = [inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness]
+#surfaces[0] -> inner_clad_surfaces
+#surfaces[1] -> inner_meat_thickness
+#surfaces[2] -> outer_meat_thickness
+#surfaces[3] -> outer_clad_thickness
 
     def create_plate_cells(self):
-        (
-            inner_clad_surfaces,
-            inner_meat_surfaces,
-            outer_meat_surfaces,
-            outer_clad_surfaces
-        ) = self.define_plates()
+        inner_clad_surfaces, inner_meat_thickness, outer_meat_thickness, outer_clad_thickness = self.define_plates()
+        # Creating surfaces to actually work with
 
         materials_dict: dict[str, openmc.Material] | None = materials.material_dict
+
         if materials_dict is None:
             materials_dict, _ = create_materials(self.fuel_choice)
-            materials.set_materials(material_dict=materials_dict)
+            materials.set_materials(material_dict=materials_dict) # pyright: ignore[reportArgumentType]
 
         if materials_dict is None:
-            raise ValueError("Materials dict is not defined")
+            raise ValueError('Materials dict is not defined')
 
-        mat_al = materials_dict['aluminum']
-        mat_fuel = materials_dict['fuel']
-        mat_water = materials_dict['water']
+        # Creating materials dictionary for the fuel, cladding, and water cells
 
-        cells = []
-
-        # Radial extent spanning all plates
-        r_span = +inner_clad_surfaces[0] & -outer_clad_surfaces[-1]
-
-        # Azimuthal edge cladding on the left (y ~ 0) and right (theta edge)
-        # Both are inside the sector: (+element_left_bound & -element_angle)
-        clad_left = r_span & +self.element_left_bound & -self.fuel_left
-        clad_right = r_span & -self.element_angle & +self.fuel_angle
-
-        cells.append(openmc.Cell(name="side_clad_left", region=clad_left, fill=mat_al))
-        cells.append(openmc.Cell(name="side_clad_right", region=clad_right, fill=mat_al))
-
-        # Active sector: bounded azimuthally between fuel_left and fuel_angle
-        active_azimuth = +self.fuel_left & -self.fuel_angle
+        clad_cells = []
+        fuel_cells = []
+        water_cells = []
 
         for i in range(fuel.plate_num):
-            clad_inner_region = +inner_clad_surfaces[i] & -inner_meat_surfaces[i] & active_azimuth
-            meat_region = +inner_meat_surfaces[i] & -outer_meat_surfaces[i] & active_azimuth
-            clad_outer_region = +outer_meat_surfaces[i] & -outer_clad_surfaces[i] & active_azimuth
+            if i == 0:
+                clad_left = +self.element_left_bound & -self.fuel_left & -outer_clad_thickness[-1] & +inner_clad_surfaces[0]
+                clad_right = +inner_clad_surfaces[0] & -outer_clad_thickness[-1] & +self.element_angle & -self.fuel_angle
 
-            cells.append(openmc.Cell(name=f"clad_in_{i}", region=clad_inner_region, fill=mat_al))
-            cells.append(openmc.Cell(name=f"fuel_{i}", region=meat_region, fill=mat_fuel))
-            cells.append(openmc.Cell(name=f"clad_out_{i}", region=clad_outer_region, fill=mat_al))
+                clad_cells.append(openmc.Cell(region=clad_left, fill=materials_dict['aluminum']))
+                clad_cells.append(openmc.Cell(region=clad_right, fill=materials_dict['aluminum']))
+                # This adds the left and right cladding of each fuel element
 
-            # Water channels between successive plates
+            clad_inner_region = +inner_clad_surfaces[i] & -inner_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
+            meat_region = +inner_meat_thickness[i] & -outer_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
+            clad_outer_region = +outer_meat_thickness[i] & -outer_clad_thickness[i] & -self.fuel_angle & +self.fuel_left
+
+            clad_cells.append(openmc.Cell(region=clad_inner_region, fill=materials_dict['aluminum']))
+            fuel_cells.append(openmc.Cell(region=meat_region, fill=materials_dict['fuel']))
+            clad_cells.append(openmc.Cell(region=clad_outer_region, fill=materials_dict['aluminum']))
+
             if i != fuel.plate_num - 1:
-                water_region = +outer_clad_surfaces[i] & -inner_clad_surfaces[i + 1] & active_azimuth
-                cells.append(openmc.Cell(name=f"water_{i}", region=water_region, fill=mat_water))
+                water_region = +outer_clad_thickness[i] & -inner_clad_surfaces[i+1] & -self.fuel_angle & +self.fuel_left
+                water_cells.append(openmc.Cell(region=water_region, fill=materials_dict['water']))
 
-        return cells
+        # Outside the loop:
+        return clad_cells + fuel_cells + water_cells
 
     def create_fuel_universe(self) -> openmc.Universe:
-        cells = self.create_plate_cells()
-        self.fuel_universe = openmc.Universe(cells=cells)
-        return self.fuel_universe
+            '''Create a universe that contains the entire fuel element. This universe can be used for rotation or other transformations.'''
+            cells = self.create_plate_cells()
+            element_universe = openmc.Universe(cells=cells)
+            self.fuel_universe = element_universe  # Store the universe in the instance variable
+            return self.fuel_universe
 
     def create_fuel_geometry(self) -> openmc.Geometry:
+        '''Create the fuel geometry and return an OpenMC Geometry object.'''
         element_universe = self.create_fuel_universe()
-        return openmc.Geometry(element_universe)
+        geom = openmc.Geometry(element_universe)
+        return geom
+
 
     def create_fuel_cell(self) -> openmc.Cell:
         if self.fuel_universe is None:
             self.create_fuel_universe()
 
-        # Reuses exact surface objects to prevent coincident surface artifacts
-        element_region = (
-            +self.inner_clad_surfaces[0] &
-            -self.outer_clad_surfaces[-1] &
-            +self.element_left_bound &
-            -self.element_angle
-        )
+        element_bound_out = openmc.ZCylinder(r=self.outer_thickness)
+        element_bound_in = openmc.ZCylinder(r=self.inner_thickness)
 
-        element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) #type: ignore
-        return openmc.Cell(name="fuel_element_cell", region=element_region, fill=self.fuel_universe)
+        # FIXED: Use element_angle (30 deg) instead of fuel_angle
+        # In OpenMC CSG, element_angle is a=-2, b=1 -> -2x + y = 0.
+        # Below y = 2x means (-2x + y <= 0), which is the negative halfspace (-self.element_angle)
+        element_region = +element_bound_in & -element_bound_out & -self.element_angle & +self.element_left_bound
+
+        element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) # type: ignore
+        return openmc.Cell(region=element_region, fill=self.fuel_universe)
 
 
 
