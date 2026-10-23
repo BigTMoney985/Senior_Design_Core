@@ -20,7 +20,7 @@ user_opts = user_opts_class()
 
 @dataclass
 class reflector_class:
-    be_thickness = 31 # beryllium thickness
+    be_thickness = 15 # beryllium thickness
     water_gap = 0.05 # gap dist of water between control element and fuel or reflector
 
     #INTERNAL VARS
