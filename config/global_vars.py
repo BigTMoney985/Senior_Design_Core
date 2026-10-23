@@ -13,7 +13,7 @@ def in_to_cm(inches: float) -> float:
 # ==================== USER OPTIONS ====================
 @dataclass
 class user_opts_class:
-    run_mode: str = 'eigenvalue'  # Default run mode is 'plot'
+    run_mode: str = 'plot'  # Default run mode is 'plot'
     legend: bool = True # Has Materials Legend on the plot
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
 user_opts = user_opts_class()
@@ -30,7 +30,7 @@ reflector = reflector_class()
 
 @dataclass
 class control_blade_class:
-    blade_thickness = 0.25 # Thickness of each blade, central blades are two in series, so thickness will be double
+    blade_thickness = 0.2 # Thickness of each blade, central blades are two in series, so thickness will be double
     central_blade_num = 6 #number of blades in the central area
     percent_semi_abs = 0.125 #The proportion of the blade that can absorb some, but not many, neutrons.
 

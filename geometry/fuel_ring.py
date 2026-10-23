@@ -10,7 +10,7 @@ class FuelRingGeometry:
         # Ensure universe is generated
         self.base_universe = self.element_factory.create_fuel_universe()
         
-        self.elements_ring = 8
+        self.elements_ring = 12
         self.wedge_deg = 360.0 / self.elements_ring
 
         # Radii matching the element bounds

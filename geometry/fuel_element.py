@@ -13,8 +13,8 @@ class FuelElementGeometry:
         # DEFINED BOUNDARIES FOR THE FUEL ELEMENT
         self.element_left_bound = openmc.YPlane(y0=0) #left bound of full element
         self.fuel_left = openmc.YPlane(y0=(fuel.clad_thickness * 2)) # left bound of the fuel region.
-        self.fuel_angle = openmc.Plane(a=-1.0, b=1.0, c=0.0, d=2*fuel.clad_thickness)
-        self.element_angle = openmc.Plane(a=-1.0, b=1.0, c=0, d=0)
+        self.fuel_angle = openmc.Plane(a=-2.0, b=1.0, c=0.0, d=2*fuel.clad_thickness)
+        self.element_angle = openmc.Plane(a=-2.0, b=1.0, c=0, d=0)
 
         self.outer_thickness = fuel.fuel_inner # This will be set when define_plates is called
         self.inner_thickness = fuel.fuel_outer # This will be set when define_plates is called
@@ -126,9 +126,9 @@ class FuelElementGeometry:
         element_bound_out = openmc.ZCylinder(r=self.outer_thickness)
         element_bound_in = openmc.ZCylinder(r=self.inner_thickness)
 
-        # FIXED: Use element_angle (45 deg) instead of fuel_angle
-        # In OpenMC CSG, element_angle is a=-1, b=1 -> -x + y = 0.
-        # Below y = x means (-x + y <= 0), which is the negative halfspace (-self.element_angle)
+        # FIXED: Use element_angle (30 deg) instead of fuel_angle
+        # In OpenMC CSG, element_angle is a=-2, b=1 -> -2x + y = 0.
+        # Below y = 2x means (-2x + y <= 0), which is the negative halfspace (-self.element_angle)
         element_region = +element_bound_in & -element_bound_out & -self.element_angle & +self.element_left_bound
 
         element_cell_class.set_vars(region=element_region, universe=self.fuel_universe) # type: ignore
