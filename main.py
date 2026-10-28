@@ -43,7 +43,10 @@ if gv.user_opts.run_mode == 'plot':
             if name in material_dict
         }
 
-    print(gv.fuel.fuel_outer)
+    print(f'Outer Rad: {gv.fuel.fuel_outer}')
+    print(f'Thickness{gv.fuel.fuel_outer - gv.fuel.fuel_inner}')
+    print(f'R_out / R_in: {gv.fuel.fuel_outer / gv.fuel.fuel_inner}')
+    
     plots = openmc.Plots([plot])
     model = openmc.Model(geometry=geom, materials=materials, plots=plots)
     model.plot_geometry()
