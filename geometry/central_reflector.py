@@ -2,6 +2,7 @@ import openmc
 import config.global_vars as gv
 
 class be_reflector:
+    """A class to generate the be reflector around the central annulus"""
     def __init__(self) -> None:
         if gv.control_blade.rad_out_central is not None:
             self.r_inner = gv.reflector.water_gap + gv.control_blade.rad_out_central
