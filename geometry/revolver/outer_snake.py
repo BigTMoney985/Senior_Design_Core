@@ -8,9 +8,11 @@ class lobe_3:
     def __init__(self) -> None:
         self.element_factory = FuelElementGeometry()
         self.base_universe = self.element_factory.create_fuel_universe()
+        self.fuel_thickness = gv.fuel.fuel_outer - gv.fuel.fuel_inner
         pass
 
-    def build_clover_with_transforms(self, wedge_sequence, thickness=4.34, r_in=4.0):
+    def build_clover_with_transforms(self, wedge_sequence, r_in=gv.fuel.fuel_inner):
+        thickness = self.fuel_thickness
         R0 = r_in + thickness / 2.0
         lobe_univ = openmc.Universe()
 
