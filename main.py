@@ -86,7 +86,7 @@ else:
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
-        particles=int(1e4),
+        particles=int(2e4),
         batches=250,
         inactive=15,
         source=openmc.IndependentSource(space=uniform_dist),
@@ -100,12 +100,18 @@ else:
         geometry=geom,
         materials=materials,
         settings=settings,
+        tallies=tallies,
     )
-    model.add_kinetics_parameters_tallies(num_groups=6)
+    #model.add_kinetics_parameters_tallies(num_groups=6)
+    # This is broken right now, dw about it.
 
     model.export_to_model_xml()
 
-    model.run()
+    if gv.user_opts.compute_choice == 'local':
+        model.run()
+
+    else:
+        print("exported model to xml files.")
 
 
 
