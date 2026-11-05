@@ -16,9 +16,10 @@ if gv.user_opts.run_mode == 'plot':
     plot.filename = 'plot_1'
     plot.basis = 'xy'
     plot.origin = (0, 0, 75)
-    plot.width = (76, 76)
+    plot.width = (34, 34)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
+    plot.show_overlaps = True
 
     color_map = {
         'aluminum': 'lightgray',
