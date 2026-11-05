@@ -70,7 +70,7 @@ class FuelElementGeometry:
         materials_dict = materials.material_dict
 
         if materials_dict is None:
-            materials_dict = create_materials(self.fuel_choice)
+            materials_dict, _ = create_materials(self.fuel_choice)
             materials.set_materials(material_dict=materials_dict)
 
         # Creating materials dictionary for the fuel, cladding, and water cells

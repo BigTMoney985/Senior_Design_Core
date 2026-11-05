@@ -70,12 +70,13 @@ vessel = vessel_class()
 
 @dataclass
 class materials_class:
-    material_dict: None | dict = None
+    material_dict: dict[str, openmc.Material] | None = None
 
-    def set_materials(self, material_dict: dict) -> None:
+    def set_materials(self, material_dict: dict[str, openmc.Material]) -> None:
+        """Set the material dictionary."""
         self.material_dict = material_dict
 
-    def get_materials(self):
+    def get_materials(self) -> dict[str, openmc.Material]:
         if self.material_dict is None:
             raise ValueError('Material Dict is not assigned')
         return self.material_dict
