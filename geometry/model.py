@@ -1,48 +1,40 @@
 import openmc 
 import config.global_vars as gv
-from geometry.fuel_ring import FuelRingGeometry
+from geometry.revolver.outer_snake import lobe_3
 from geometry.surrounding_water import WaterGeometry
 from geometry.central_reflector import be_reflector
-from geometry.control_blades.central_blades import central_blades_cl
 
 def create_geometry():
-    fuel_ring_geometry = FuelRingGeometry()
-    control_blades = central_blades_cl()
-    be_geom = be_reflector() # This has to be here or the code breaks
+    # 1. Initialize 3-lobe core + lobe control blades + central flux-trap control mechanism
+    three_lobe_core = lobe_3()
+
+    # 2. Initialize Beryllium reflector (automatically reads updated gv.control_blade.rad_out_central)
+    be_geom = be_reflector()
     water_geom = WaterGeometry()
 
-    # Create shared boundary cylinders
+    # 3. Create shared reflector boundary cylinders
     surf_dict = water_geom.create_surfaces()
+    be_cell = be_geom.create_be_cells(surf_dict['be_in'], surf_dict['be_out'])
 
-    # 1. Water cells (central cavity + outer reflector)
-    water_cells = water_geom.create_water_cells_inner(surf_dict)
-    water_cells += water_geom.create_water_cells_around(surf_dict)
-
-    # 2. Fuel ring cell (bounded strictly to the annular space)
-    ring_cell = openmc.Cell(
-        name="fuel_ring_annulus",
-        fill=fuel_ring_geometry.create_fuel_ring(),
-        region=+surf_dict['inner_cyl'] & -surf_dict['outer_cyl'] & gv.graveyard.graveyard_region
+    # 4. Build all explicit fuel, control blade, and water cells inside the core cylinder (-be_in)
+    # Full withdrawal preset:
+    #   z_lobe_inner = -162.5 (inner lobe blades withdrawn)
+    #   z_lobe_outer = [0.0]*12 (12 outer lobe blades withdrawn)
+    #   z_center_inner = -162.5 (central trap inner safety rod withdrawn)
+    #   z_center_outer = [0.0]*6 (central trap outer blades withdrawn)
+    core_cells = three_lobe_core.build_clover_cells(
+        core_outer_cyl=surf_dict['be_in'],
+        z_lobe_inner=-162.5,
+        z_lobe_outer=[0.0] * 12,
+        z_center_inner=-162.5,
+        z_center_outer=[0.0] * 6,
     )
 
-    # 3. Be reflector region
-    inner_cyl, outer_cyl = be_geom.create_surfaces()
-    be_cell = be_geom.create_be_cells(inner_cyl, outer_cyl)
+    # 5. Build outer reflector water cells
+    outer_water_cells = water_geom.create_water_cells_around(surf_dict)
 
-    # 4 Control blade region
-    
-    # Curent full withdrawal for main central blade is -162.5, with full insertion of it being 0.
-    # Current full withdrawal for all other is 0, with full insertion at -162.5 (-150 * 1.125)
-    #control_blades_cell = control_blades.create_channel_cell([-162.5, 0, 0, 0, 0, 0, 0,])
-
-    # Full Out Outer PRESET ==========
-    control_blades_cell = control_blades.create_channel_cell([-162.5] + [0] * 6)
-
-    
-
-    # 5. Assemble root universe
-    root_universe = openmc.Universe(cells=water_cells + [ring_cell] + [be_cell] + control_blades_cell)
+    # 6. Assemble root universe
+    root_universe = openmc.Universe(cells=core_cells + [be_cell] + outer_water_cells)
     root_geometry = openmc.Geometry(root=root_universe)
-    #root_geometry.export_to_xml()   |   NOT NEEDED SINCE GEOMETRY IS PULLED
 
     return root_geometry
