@@ -11,10 +11,11 @@ class FuelElementGeometry:
 
 
         # DEFINED BOUNDARIES FOR THE FUEL ELEMENT
-        self.element_left_bound = openmc.YPlane(y0=0) #left bound of full element
-        self.fuel_left = openmc.YPlane(y0=(fuel.clad_thickness * 2)) # left bound of the fuel region.
-        self.fuel_angle = openmc.Plane(a=-1.0, b=1.0, c=0.0, d=2*fuel.clad_thickness)
-        self.element_angle = openmc.Plane(a=-1.0, b=1.0, c=0, d=0)
+        alpha = np.radians(60.0)
+        self.element_left_bound = openmc.YPlane(y0=0.0)
+        self.fuel_left = openmc.YPlane(y0=fuel.clad_thickness)
+        self.element_angle = openmc.Plane(a=-np.sin(alpha), b=np.cos(alpha), c=0.0, d=0.0)
+        self.fuel_angle = openmc.Plane(a=-np.sin(alpha), b=np.cos(alpha), c=0.0, d=-fuel.clad_thickness)
 
         self.outer_thickness = fuel.fuel_inner # This will be set when define_plates is called
         self.inner_thickness = fuel.fuel_outer # This will be set when define_plates is called
