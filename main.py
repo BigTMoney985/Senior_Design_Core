@@ -16,26 +16,19 @@ if gv.user_opts.run_mode == 'plot':
     plot.filename = 'plot_1'
     plot.basis = 'xy'
     plot.origin = (0, 0, 75)
-    plot.width = (26, 26)
+    plot.width = (76, 76)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
 
     color_map = {
         'aluminum': 'lightgray',
-        #'ss_304': 'darkgray',
-        #'ss_304L': 'dimgray',
-        #'concrete': 'lightblue',
-        #'air': 'white',
+        'ss_304': 'darkgray',
         'be_metal': 'lightyellow',
-        #'graphite': 'black',
-        #'boron': 'green',
         'b4c': 'darkgreen',
         'fuel': 'red',
         'water': 'blue',
-        #'zr_barrier': 'orange'
     }
 
-    # Map actual openmc.Material objects to colors
     if material_dict is not None:
         plot.colors = {
             material_dict[name]: color 
@@ -43,25 +36,22 @@ if gv.user_opts.run_mode == 'plot':
             if name in material_dict
         }
 
-    print(gv.fuel.fuel_outer)
+    print(f'Lobe Fuel Outer Rad: {gv.fuel.fuel_outer:.4f} cm')
+    print(f'Fuel Thickness: {gv.fuel.fuel_outer - gv.fuel.fuel_inner:.4f} cm')
+    print(f'Be Reflector Inner Rad: {gv.reflector.r_inner:.4f} cm')
+    print(f'Be Reflector Outer Rad: {gv.reflector.r_outer:.4f} cm')
+    
     plots = openmc.Plots([plot])
     model = openmc.Model(geometry=geom, materials=materials, plots=plots)
     model.plot_geometry()
 
     if gv.user_opts.legend:
-
-        # Load rendered image
         img = plt.imread(f'{plot.filename}.png')
-
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.imshow(img)
 
-        # Build legend patches directly using color strings and material names
         patches = [
-            mpatches.Patch(
-                color=color,
-                label=mat.name
-            )
+            mpatches.Patch(color=color, label=mat.name)
             for mat, color in plot.colors.items()
         ]
 
@@ -70,43 +60,37 @@ if gv.user_opts.run_mode == 'plot':
         plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
         plt.close()
 
-
 else:
-    # TALLIES =================================
-    # material_filter = openmc.MaterialFilter([material_dict['water'].id, material_dict['fuel'].id, material_dict['aluminum'].id])
     tallies = openmc.Tallies()
     
     mesh = openmc.RegularMesh()
     mesh.dimension = [500, 500]
-    mesh.lower_left = [-20.0, -20.0]  # pyright: ignore[reportAttributeAccessIssue]
-    mesh.upper_right = [20.0, 20.0] # pyright: ignore[reportAttributeAccessIssue]
+    mesh.lower_left = [-25.0, -25.0]
+    mesh.upper_right = [25.0, 25.0]
     mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally(name='mesh tally')
     tally.filters = [mesh_filter]
     tally.scores = ['absorption', 'flux', 'fission']
     tallies.append(tally)
 
-    # Thermal Flux Utilization tallies
     fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
     fuel_therm_abs_rate.scores = ['absorption']
-    fuel_therm_abs_rate.filters = [openmc.EnergyFilter([0., 0.625]),
-                                openmc.MaterialFilter([material_dict['fuel']])]
-
+    fuel_therm_abs_rate.filters = [
+        openmc.EnergyFilter([0., 0.625]),
+        openmc.MaterialFilter([material_dict['fuel']])
+    ]
     tallies.append(fuel_therm_abs_rate)
 
-    # tallies.export_to_xml()
-
-    
-    bounds = [-12, -12, 0, 20, 20, 120,]
-    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # pyright: ignore[reportAttributeAccessIssue]
+    bounds = [-25, -25, 0, 25, 25, 150]
+    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True)
 
     settings = openmc.Settings(
-        run_mode = 'eigenvalue',
-        particles = int(1e4),
-        batches = 250,
-        inactive = 15,
-        source = openmc.IndependentSource(space=uniform_dist),
-        output = {'tallies': True},
+        run_mode='eigenvalue',
+        particles=int(1e4),
+        batches=250,
+        inactive=15,
+        source=openmc.IndependentSource(space=uniform_dist),
+        output={'tallies': True},
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
