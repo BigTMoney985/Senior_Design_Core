@@ -82,7 +82,7 @@ else:
     tallies.append(fuel_therm_abs_rate)
 
     bounds = [-25, -25, 0, 25, 25, 150]
-    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True)
+    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # type: ignore
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
