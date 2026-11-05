@@ -1,5 +1,5 @@
 import openmc
-import numpy as np
+import numpy as np #type: ignore
 import config.global_vars as gv
 from geometry.fuel_element import FuelElementGeometry
 from geometry.control_blades.central_blades import central_blades_cl
@@ -275,9 +275,9 @@ class lobe_3:
         #     (+c_ctrl_out) and the inward-curving fuel wedge (+nhub['c_out'])
         #   - 1 slice of the central flux-trap control assembly (-c_ctrl_out)
         # ---------------------------------------------------------------------
-        c_ctrl_in = self.central_blade_builder.surface_dict['inner_cyl']
-        c_ctrl_mid = self.central_blade_builder.surface_dict['mid_cyl']
-        c_ctrl_out = self.central_blade_builder.surface_dict['outer_cyl']
+        c_ctrl_in = self.central_blade_builder.surface_dict['inner_cyl'] #type: ignore
+        c_ctrl_mid = self.central_blade_builder.surface_dict['mid_cyl'] #type: ignore
+        c_ctrl_out = self.central_blade_builder.surface_dict['outer_cyl'] #type: ignore
 
         # Each tuple: (neg_hub_index, start_angle_deg, triangle_plane_region, central_blade_sector_idx)
         central_triangles = [
@@ -347,7 +347,7 @@ class lobe_3:
         cells.append(c_inner_blade_cell)
 
         # 3. Central outer 6 segmented blades (r = 3.70 to 3.90 cm)
-        c_planes = self.central_blade_builder.surface_dict['plane_list']
+        c_planes = self.central_blade_builder.surface_dict['plane_list'] #type: ignore
         num_c_planes = len(c_planes)
         for i in range(num_c_planes):
             w_reg = +c_planes[i] & -c_planes[(i + 1) % num_c_planes]

@@ -1,5 +1,5 @@
 import openmc
-import numpy as np
+import numpy as np #type: ignore
 import config.global_vars as gv
 
 class central_blades_cl:
