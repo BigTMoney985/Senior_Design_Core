@@ -43,7 +43,7 @@ control_blade = control_blade_class()
 
 @dataclass
 class fluxtrap_class:
-    r_in: float = 4.0  # Inner radius of each lobe flux trap and inscribed central cavity
+    r_in: float = 3.0  # Inner radius of each lobe flux trap and inscribed central cavity
 fluxtrap = fluxtrap_class()
 
 @dataclass
