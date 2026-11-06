@@ -26,8 +26,8 @@ class lobe_3:
         self.R0 = self.r_in + self.fuel_thickness / 2.0
 
         # Conformal control blades (r = 8.3916 to 8.7916 cm from hub center)
-        # Used BOTH on the outside of the 3 main lobes AND hugging the central-trap
-        # side of the 3 inward-curving pinch lobes!
+        # Used BOTH on the outside of the 3 main lobes AND hugging the inside
+        # (central flux-trap side) of the 3 inward-curving pinch lobes!
         self.lobe_blade_builder = central_blades_cl(
             r_inner_override=self.r_out + gv.reflector.water_gap
         )
@@ -114,7 +114,7 @@ class lobe_3:
                 'hex_high': hex_plane_high,
             })
 
-        # 3 Negative Hub Centers (at 90°, 210°, 330°) — now with conformal blade cylinders!
+        # 3 Negative Hub Centers (at 90°, 210°, 330°)
         neg_hub_angles = [90.0, 210.0, 330.0]
         neg_hubs = []
         for ang in neg_hub_angles:
@@ -139,6 +139,7 @@ class lobe_3:
         for lobe_idx, hub in enumerate(pos_hubs):
             cx, cy, ang = hub['cx'], hub['cy'], hub['ang']
 
+            # Main lobe circular flux trap (r < 4.0 cm around pos_hub)
             cells.append(openmc.Cell(
                 name=f"lobe_{lobe_idx}_flux_trap_water",
                 fill=self.water_mat,
@@ -227,9 +228,9 @@ class lobe_3:
 
         # =====================================================================
         # PART B: THE 6 INNER EQUILATERAL TRIANGLES
-        # Note how hex_high and hex_low match the actual hexagon edge in each slice,
-        # and each pinch fuel wedge now has conformal control blades hugging its
-        # inside (central flux-trap) surface (+nhub['b_in'] to -nhub['b_out'])!
+        # Each triangle contains 1 inward-curving pinch fuel wedge, conformal
+        # control blades hugging its central-trap wall, and 1/6th of the
+        # central triangular flux trap water!
         # =====================================================================
         triangle_specs = [
             ( -30.0,  30.0, 0, 'hex_high', 2,  90.0),  # Seg 17 (around Neg Hub 2 at 330°)
@@ -249,6 +250,11 @@ class lobe_3:
 
             nhub = neg_hubs[nh_idx]
             ncx, ncy = nhub['cx'], nhub['cy']
+
+            # Exclude the Positive Hub's inner flux trap (+pos_hubs[ph_idx]['c_in'])
+            # so the triangle's corner at the Positive Hub never overlaps lobe_X_flux_trap_water!
+            phub_c_in = pos_hubs[ph_idx]['c_in']
+            safe_tri = tri_region & +phub_c_in
 
             # 1. Pinch hub inner water inside this triangle (-nhub['c_in'])
             cells.append(openmc.Cell(
@@ -283,14 +289,14 @@ class lobe_3:
             cells.append(openmc.Cell(
                 name=f"pinch_wedge_{t_idx}_blade_gap_water",
                 fill=self.water_mat,
-                region=+nhub['c_out'] & -nhub['b_in'] & tri_region & gv.graveyard.graveyard_region
+                region=+nhub['c_out'] & -nhub['b_in'] & safe_tri & gv.graveyard.graveyard_region
             ))
 
-            # 5. Conformal Central Control Blade Layer 1 (hugging the inside of the pinch fuel!)
+            # 5. Conformal Central Control Blade Layer 1 (hugging the inside of the pinch fuel)
             pib_cell = openmc.Cell(
                 name=f"central_conformal_inner_blade_{t_idx}",
                 fill=lobe_inner_blade_univ,
-                region=+nhub['b_in'] & -nhub['b_mid'] & tri_region & axial_blade
+                region=+nhub['b_in'] & -nhub['b_mid'] & safe_tri & axial_blade
             )
             pib_cell.translation = (ncx, ncy, z_center_inner)
             pib_cell.rotation = (0.0, 0.0, start_deg)
@@ -300,7 +306,7 @@ class lobe_3:
             pob_cell = openmc.Cell(
                 name=f"central_conformal_outer_blade_{t_idx}",
                 fill=lobe_outer_blade_univ,
-                region=+nhub['b_mid'] & -nhub['b_out'] & tri_region & axial_blade
+                region=+nhub['b_mid'] & -nhub['b_out'] & safe_tri & axial_blade
             )
             pob_cell.translation = (ncx, ncy, z_center_outer[t_idx])
             pob_cell.rotation = (0.0, 0.0, start_deg)
@@ -310,19 +316,20 @@ class lobe_3:
             cells.append(openmc.Cell(
                 name=f"central_conformal_blade_{t_idx}_water_above",
                 fill=self.water_mat,
-                region=+nhub['b_in'] & -nhub['b_out'] & tri_region & +guide_top & gv.graveyard.graveyard_region
+                region=+nhub['b_in'] & -nhub['b_out'] & safe_tri & +guide_top & gv.graveyard.graveyard_region
             ))
             cells.append(openmc.Cell(
                 name=f"central_conformal_blade_{t_idx}_water_below",
                 fill=self.water_mat,
-                region=+nhub['b_in'] & -nhub['b_out'] & tri_region & -guide_bot & gv.graveyard.graveyard_region
+                region=+nhub['b_in'] & -nhub['b_out'] & safe_tri & -guide_bot & gv.graveyard.graveyard_region
             ))
 
-            # 8. Central Triangular Flux-Trap Water Core (inside +nhub['b_out'] & tri_region)
+            # 8. Central Triangular Flux-Trap Water Core
+            # Bounded by +nhub['b_out'] (inside the central cavity) and safe_tri (+phub_c_in)
             cells.append(openmc.Cell(
                 name=f"central_triangular_flux_trap_water_{t_idx}",
                 fill=self.water_mat,
-                region=+nhub['b_out'] & tri_region & gv.graveyard.graveyard_region
+                region=+nhub['b_out'] & safe_tri & gv.graveyard.graveyard_region
             ))
 
         return cells
