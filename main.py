@@ -24,7 +24,7 @@ if gv.user_opts.run_mode == 'plot':
     color_map = {
         'aluminum': 'lightgray',
         'ss_304': 'darkgray',
-        'be_metal': 'lightyellow',
+        'be_metal': 'maroon',
         'b4c': 'darkgreen',
         'fuel': 'red',
         'water': 'blue',
