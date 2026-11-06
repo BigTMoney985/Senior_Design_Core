@@ -78,8 +78,8 @@ else:
     fuel_therm_abs_rate.scores = ['absorption']
     fuel_therm_abs_rate.filters = [
         openmc.EnergyFilter([0., 0.625]),
-        openmc.MaterialFilter([material_dict['fuel']],
-        openmc.ParticleFilter(['neutron']))
+        openmc.MaterialFilter([material_dict['fuel']]),
+        openmc.ParticleFilter(['neutron'])
     ]
     tallies.append(fuel_therm_abs_rate)
     
@@ -98,10 +98,11 @@ else:
         source=openmc.IndependentSource(space=uniform_dist),
         output={'tallies': True},
         photon_transport = True,
+        max_lost_particles = 50,
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
-    settings.ifp_n_generation = 10
+    #settings.ifp_n_generation = 10
 
     model = openmc.Model(
         geometry=geom,
