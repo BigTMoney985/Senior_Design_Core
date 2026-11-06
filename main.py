@@ -70,7 +70,9 @@ else:
     mesh.upper_right = [20.0, 20.0] #type: ignore
     mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally(name='mesh tally')
-    tally.filters = [mesh_filter, openmc.ParticleFilter(['neutron'])]
+    tally.filters = [mesh_filter, 
+                     openmc.ParticleFilter(['neutron']), 
+                     openmc.EnergyFilter([0., 1.0, 20.0e6])]
     tally.scores = ['absorption', 'flux', 'fission']
     tallies.append(tally)
 
@@ -96,8 +98,8 @@ else:
         batches=250,
         inactive=15,
         source=openmc.IndependentSource(space=uniform_dist),
-        output={'tallies': True},
-        photon_transport = True,
+        #output={'tallies': True},
+        photon_transport = False,
         max_lost_particles = 50,
     )
 
