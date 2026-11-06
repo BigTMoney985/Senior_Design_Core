@@ -16,14 +16,14 @@ if gv.user_opts.run_mode == 'plot':
     plot.filename = 'plot_1'
     plot.basis = 'xy'
     plot.origin = (0, 0, 75)
-    plot.width = (34, 34)
+    plot.width = (40, 40)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
     plot.show_overlaps = True
 
     color_map = {
         'aluminum': 'lightgray',
-        'ss_304': 'darkgray',
+        #'ss_304': 'darkgray',
         'be_metal': 'maroon',
         'b4c': 'darkgreen',
         'fuel': 'red',
@@ -48,8 +48,16 @@ if gv.user_opts.run_mode == 'plot':
 
     if gv.user_opts.legend:
         img = plt.imread(f'{plot.filename}.png')
+
+        extent = [-20.0, 20.0, -20.0, 20.0]
+
         fig, ax = plt.subplots(figsize=(10, 8))
-        ax.imshow(img)
+        ax.imshow(img, extent=extent, origin='upper') # type: ignore
+        ax.set_xticks(range(-20, 21, 5))
+        ax.set_yticks(range(-20, 21, 5))
+        ax.set_xlabel("x [cm]")
+        ax.set_ylabel("y [cm]")
+        ax.tick_params(axis='both', which='both', direction='out', length=5)
 
         patches = [
             mpatches.Patch(color=color, label=mat.name)
@@ -57,7 +65,7 @@ if gv.user_opts.run_mode == 'plot':
         ]
 
         ax.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc='upper left')
-        plt.axis('off')
+        #plt.axis('off')
         plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
         plt.close()
 
