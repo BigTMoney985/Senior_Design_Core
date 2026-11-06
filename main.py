@@ -66,8 +66,8 @@ else:
     
     mesh = openmc.RegularMesh()
     mesh.dimension = [500, 500]
-    mesh.lower_left = [-25.0, -25.0]
-    mesh.upper_right = [25.0, 25.0]
+    mesh.lower_left = [-25.0, -25.0] #type: ignore
+    mesh.upper_right = [25.0, 25.0] #type: ignore
     mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally(name='mesh tally')
     tally.filters = [mesh_filter]
@@ -81,6 +81,10 @@ else:
         openmc.MaterialFilter([material_dict['fuel']])
     ]
     tallies.append(fuel_therm_abs_rate)
+    
+    heating_tally = openmc.Tally(name='heating rate')
+    heating_tally.scores = ['heating']
+    tallies.append(heating_tally)
 
     bounds = [-25, -25, 0, 25, 25, 150]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # type: ignore
