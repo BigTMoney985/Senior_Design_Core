@@ -13,8 +13,8 @@ def in_to_cm(inches: float) -> float:
 # ==================== USER OPTIONS ====================
 @dataclass
 class user_opts_class:
-    run_mode: str = 'plot'  # Default run mode is 'plot'
-    compute_choice: str = 'local' # options: 'local', 'hpc'
+    run_mode: str = 'eigenvalue'  # Default run mode is 'plot'
+    compute_choice: str = 'hpc' # options: 'local', 'hpc'
     legend: bool = True     # Has Materials Legend on the plot
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
 user_opts = user_opts_class()
@@ -35,10 +35,6 @@ class control_blade_class:
     central_blade_num: int = 6      # Number of blades in the central area / per 360 deg
     percent_semi_abs: float = 0.125 # Proportion of blade that is semi-absorber (SS-304)
 
-    # Central flux-trap control assembly radii (inscribed inside r = 3.0 cm central cavity)
-    central_trap_r_out: float = 2.90
-    central_trap_r_mid: float = 2.70
-    central_trap_r_in: float = 2.50
 
     # INTERNAL VARS (Outer lobe blades & overall core outer radius)
     rad_out_central: float | None = None
@@ -56,7 +52,7 @@ class fuel_class:
     meat_thickness: float = 0.08
     clad_thickness: float = in_to_cm(0.015)
     nominal_dist: float = 0.09
-    fuel_inner: float = 3.0 # from 4.0
+    fuel_inner: float = 4.0 # from 4.0
     plate_num: int = 18
     height: float = 150.0
 
