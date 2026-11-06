@@ -96,6 +96,7 @@ else:
         inactive=15,
         source=openmc.IndependentSource(space=uniform_dist),
         output={'tallies': True},
+        photon_transport = True,
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
