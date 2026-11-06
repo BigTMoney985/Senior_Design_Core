@@ -104,7 +104,7 @@ else:
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
-    #settings.ifp_n_generation = 10
+    settings.ifp_n_generation = 10
 
     model = openmc.Model(
         geometry=geom,
@@ -112,7 +112,7 @@ else:
         settings=settings,
         tallies=tallies,
     )
-    #model.add_kinetics_parameters_tallies(num_groups=6)
+    model.add_kinetics_parameters_tallies(num_groups=6)
     # This is broken right now, dw about it.
 
     model.export_to_model_xml()

@@ -98,6 +98,8 @@ def create_materials(mat_choice: str):
     b4c.add_element('C', 1)
     b4c.set_density('g/cm3', 2.5)
 
+    #b4c = ss_304.clone() # testing ss-304 as a replacement for boron.
+
     #==============================FUEL CANDIDATES===============================
 
     if mat_choice.lower() == 'u3si2':
