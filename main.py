@@ -70,7 +70,7 @@ else:
     mesh.upper_right = [20.0, 20.0] #type: ignore
     mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally(name='mesh tally')
-    tally.filters = [mesh_filter]
+    tally.filters = [mesh_filter, openmc.ParticleFilter(['neutron'])]
     tally.scores = ['absorption', 'flux', 'fission']
     tallies.append(tally)
 
@@ -78,7 +78,8 @@ else:
     fuel_therm_abs_rate.scores = ['absorption']
     fuel_therm_abs_rate.filters = [
         openmc.EnergyFilter([0., 0.625]),
-        openmc.MaterialFilter([material_dict['fuel']])
+        openmc.MaterialFilter([material_dict['fuel']],
+        openmc.ParticleFilter(['neutron']))
     ]
     tallies.append(fuel_therm_abs_rate)
     
@@ -91,7 +92,7 @@ else:
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
-        particles=int(2e4),
+        particles=int(2e5),
         batches=250,
         inactive=15,
         source=openmc.IndependentSource(space=uniform_dist),
