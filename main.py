@@ -66,8 +66,8 @@ else:
     
     mesh = openmc.RegularMesh()
     mesh.dimension = [500, 500]
-    mesh.lower_left = [-25.0, -25.0] #type: ignore
-    mesh.upper_right = [25.0, 25.0] #type: ignore
+    mesh.lower_left = [-20.0, -20.0] #type: ignore
+    mesh.upper_right = [20.0, 20.0] #type: ignore
     mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally(name='mesh tally')
     tally.filters = [mesh_filter]
