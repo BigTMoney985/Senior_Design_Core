@@ -12,4 +12,6 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 - [x] Add a function to get the material dict to get rid of the errors
 - [x] Add separate water cells so we don't have weird not stuff
 - [ ] Update rod withdrawal algorithm so it makes sense.
-- [ ] Reduce the ratio of r_in to r_out to less than 2.16
+- [x] Reduce the ratio of r_in to r_out to less than 2.16
+- [x] Actually make three-lobed core
+- [ ] Separate control blades and be distance into two vars.
