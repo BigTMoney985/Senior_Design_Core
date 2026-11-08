@@ -6,7 +6,7 @@ except ImportError:
 import config.global_vars as gv
 
 
-def create_materials(mat_choice: str):
+def create_materials(mat_choice: str):   
     '''Create and return a set of predefined materials based on the chosen material type.'''
     valid_choices = ['u3si2', 'u3o8', 'u10mo']
 
@@ -93,10 +93,9 @@ def create_materials(mat_choice: str):
     boron.set_density('g/cm3', 2.34)
 
     # Boron Carbide
-    b4c = openmc.Material(name='Boron Carbide')
-    b4c.add_element('B', 4)
-    b4c.add_element('C', 1)
-    b4c.set_density('g/cm3', 2.5)
+    hf = openmc.Material(name='Hafnium control')
+    hf.add_element('Hf', 1)
+    hf.set_density('g/cm3', 13.31)
 
     #==============================FUEL CANDIDATES===============================
 
@@ -142,7 +141,7 @@ def create_materials(mat_choice: str):
         'be_metal': be_metal,
         'graphite': graphite,
         'boron': boron,
-        'b4c': b4c,
+        'hf': hf,
         'fuel': fuel,
         'water': water,
         'zr_barrier': zr_barrier,

@@ -25,7 +25,7 @@ if gv.user_opts.run_mode == 'plot':
         'aluminum': 'lightgray',
         'ss_304': 'darkgray',
         'be_metal': 'lightyellow',
-        'b4c': 'darkgreen',
+        'hf': 'darkgreen',
         'fuel': 'red',
         'water': 'blue',
     }

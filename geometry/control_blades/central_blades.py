@@ -24,7 +24,7 @@ class central_blades_cl:
 
         material_dict = gv.materials.get_materials()
         self.water = material_dict['water']
-        self.b4c = material_dict['b4c']
+        self.hf = material_dict['hf']
         self.ss304 = material_dict['ss_304']
         self.aluminum = material_dict['aluminum']
 
@@ -91,7 +91,7 @@ class central_blades_cl:
         ))
         inner_blade.append(openmc.Cell(
             name='central blade poison',
-            fill=self.b4c,
+            fill=self.hf,
             region=inner_blade_cyl_reg & -self.surface_dict['semi_start'] & +self.surface_dict['bottom']
         ))
 
@@ -113,7 +113,7 @@ class central_blades_cl:
             )
             outer_poison = openmc.Cell(
                 name=f'outer central blade {i+1} poison',
-                fill=self.b4c,
+                fill=self.hf,
                 region=outer_blade_cyl_reg & -self.surface_dict['top'] & +self.surface_dict['semi_end'] & wedge_region
             )
             outer_semi = openmc.Cell(
@@ -123,7 +123,7 @@ class central_blades_cl:
             )
             outer_transparent = openmc.Cell(
                 name=f'outer central blade {i+1} transparent section',
-                fill=self.aluminum,
+                fill=self.be_metal,
                 region=outer_blade_cyl_reg & -self.surface_dict['semi_start'] & +self.surface_dict['bottom'] & wedge_region
             )
             outer_blades.append([below_water, above_water, outer_poison, outer_semi, outer_transparent])
