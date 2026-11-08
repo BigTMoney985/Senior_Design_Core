@@ -6,7 +6,7 @@ except ImportError:
 import config.global_vars as gv
 
 
-def create_materials(mat_choice: str):   
+def create_materials(mat_choice: str):      
     '''Create and return a set of predefined materials based on the chosen material type.'''
     valid_choices = ['u3si2', 'u3o8', 'u10mo']
 
