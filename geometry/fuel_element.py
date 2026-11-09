@@ -49,6 +49,7 @@ class FuelElementGeometry:
             outer_clad_thickness.append(openmc.ZCylinder(r=_outer_clad_thickness))
 
             if i == fuel.plate_num - 1:
+                _outer_clad_thickness = round(_outer_clad_thickness, 6)
                 self.outer_thickness = _outer_clad_thickness
                 fuel.fuel_outer = self.outer_thickness
                 self.inner_thickness = inner_clad_surfaces[0].r
