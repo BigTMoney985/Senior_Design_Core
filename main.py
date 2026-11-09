@@ -20,6 +20,7 @@ if gv.user_opts.run_mode == 'plot':
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
     plot.show_overlaps = True
+    plot.overlap_color = 'yellow'
 
     color_map = {
         'aluminum': 'lightgray',

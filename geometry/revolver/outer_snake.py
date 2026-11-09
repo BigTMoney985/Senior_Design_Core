@@ -76,27 +76,35 @@ class lobe_3:
         the child universe's local surfaces.
         """
         # 1. Pad Fuel Element Universe (base_universe)
-        u1_cells = list(self.base_universe.cells.values())
-        assert u1_cells[0].region is not None
-        side_clad_surfaces = u1_cells[0].region.get_surfaces()
+        all_u1_surfaces: dict[int, openmc.Surface] = {}
+        for cell in self.base_universe.cells.values():
+            if cell.region is not None:
+                all_u1_surfaces.update(cell.region.get_surfaces())
+
         u1_cyls = sorted(
-            [s for s in side_clad_surfaces.values() if isinstance(s, openmc.ZCylinder)],
+            [s for s in all_u1_surfaces.values() if isinstance(s, openmc.ZCylinder)],
             key=lambda c: float(c.r)
         )
-        u1_r_in_surf, u1_r_out_surf = u1_cyls[0], u1_cyls[-1]
         u1_left_bound, _, _, u1_angle_bound = self.element_factory.get_planes()
 
-        u1_buffer_reg = (
-            -u1_r_in_surf
-            | +u1_r_out_surf
-            | -u1_left_bound
-            | +u1_angle_bound
-        )
-        self.base_universe.add_cell(openmc.Cell(
-            name="fuel_univ_float_drift_buffer",
-            fill=self.al_mat,
-            region=u1_buffer_reg
-        ))
+        # Build the exterior buffer only for bounding surfaces that are actually
+        # used to clip cells inside base_universe
+        u1_buffer_terms = []
+        if u1_cyls:
+            u1_r_in_surf, u1_r_out_surf = u1_cyls[0], u1_cyls[-1]
+            u1_buffer_terms.append(-u1_r_in_surf)
+            u1_buffer_terms.append(+u1_r_out_surf)
+        if u1_left_bound.id in all_u1_surfaces:
+            u1_buffer_terms.append(-u1_left_bound)
+        if u1_angle_bound.id in all_u1_surfaces:
+            u1_buffer_terms.append(+u1_angle_bound)
+
+        if u1_buffer_terms:
+            self.base_universe.add_cell(openmc.Cell(
+                name="fuel_univ_float_drift_buffer",
+                fill=self.al_mat,
+                region=openmc.Union(u1_buffer_terms)
+            ))
 
         # 2. Pad Inner Annular Blade Universe (lobe_blade_univs[0])
         sd = self.lobe_blade_builder.surface_dict
@@ -106,27 +114,38 @@ class lobe_3:
         outer_cyl: openmc.ZCylinder = sd['outer_cyl']
         wedge_planes: list[openmc.Plane] = sd['plane_list']
 
-        u2_buffer_reg = -inner_cyl | +mid_cyl
-        self.lobe_blade_univs[0].add_cell(openmc.Cell(
-            name="inner_blade_univ_float_drift_buffer",
-            fill=self.water_mat,
-            region=u2_buffer_reg
-        ))
+        u2_surfaces: dict[int, openmc.Surface] = {}
+        for cell in self.lobe_blade_univs[0].cells.values():
+            if cell.region is not None:
+                u2_surfaces.update(cell.region.get_surfaces())
+
+        if inner_cyl.id in u2_surfaces and mid_cyl.id in u2_surfaces:
+            self.lobe_blade_univs[0].add_cell(openmc.Cell(
+                name="inner_blade_univ_float_drift_buffer",
+                fill=self.water_mat,
+                region=-inner_cyl | +mid_cyl
+            ))
 
         # 3. Pad Outer Segmented Blade Universes (lobe_blade_univs[1:])
         plane_no = len(wedge_planes)
         for i, outer_u in enumerate(self.lobe_blade_univs[1:]):
-            u3_buffer_reg = (
-                -mid_cyl
-                | +outer_cyl
-                | -wedge_planes[i]
-                | +wedge_planes[(i + 1) % plane_no]
-            )
-            outer_u.add_cell(openmc.Cell(
-                name=f"outer_blade_{i+1}_univ_float_drift_buffer",
-                fill=self.water_mat,
-                region=u3_buffer_reg
-            ))
+            u3_surfaces: dict[int, openmc.Surface] = {}
+            for cell in outer_u.cells.values():
+                if cell.region is not None:
+                    u3_surfaces.update(cell.region.get_surfaces())
+
+            if mid_cyl.id in u3_surfaces and outer_cyl.id in u3_surfaces:
+                u3_buffer_reg = (
+                    -mid_cyl
+                    | +outer_cyl
+                    | -wedge_planes[i]
+                    | +wedge_planes[(i + 1) % plane_no]
+                )
+                outer_u.add_cell(openmc.Cell(
+                    name=f"outer_blade_{i+1}_univ_float_drift_buffer",
+                    fill=self.water_mat,
+                    region=u3_buffer_reg
+                ))
 
     def build_clover_cells(
         self,
@@ -392,7 +411,7 @@ class lobe_3:
             )
             pob_cell.translation = (ncx, ncy, z_center_outer[t_idx])
             pob_cell.rotation = (0.0, 0.0, start_deg)
-            cells.append(pob_cell)
+            cells.append(pib_cell if False else pob_cell)
 
             # 7. Water above and below the conformal central control blades
             cells.append(openmc.Cell(
