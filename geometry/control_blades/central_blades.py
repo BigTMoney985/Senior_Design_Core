@@ -95,11 +95,6 @@ class central_blades_cl:
             fill=self.hf,
             region=inner_blade_cyl_reg & -self.surface_dict['semi_start'] & +self.surface_dict['bottom']
         ))
-        inner_blade.append(openmc.Cell(
-            name='inner blade float drift buffer',
-            fill=self.water,
-            region=-self.surface_dict['inner_cyl'] | +self.surface_dict['mid_cyl']
-        ))
 
         # Outer 60-deg segmented blade universes
         wedge_planes = self.surface_dict['plane_list']
@@ -132,19 +127,7 @@ class central_blades_cl:
                 fill=self.be_metal,
                 region=outer_blade_cyl_reg & -self.surface_dict['semi_start'] & +self.surface_dict['bottom'] & wedge_region
             )
-            outer_drift_buffer = openmc.Cell(
-                name=f'outer blade {i+1} float drift buffer',
-                fill=self.water,
-                region=(
-                    -self.surface_dict['mid_cyl']
-                    | +self.surface_dict['outer_cyl']
-                    | -wedge_planes[i]
-                    | +wedge_planes[(i + 1) % plane_no]
-                )
-            )
-            outer_blades.append([
-                below_water, above_water, outer_poison, outer_semi, outer_transparent, outer_drift_buffer
-            ])
+            outer_blades.append([below_water, above_water, outer_poison, outer_semi, outer_transparent])
 
         return inner_blade, outer_blades
 
