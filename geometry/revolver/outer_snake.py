@@ -83,7 +83,7 @@ class lobe_3:
 
         u1_cyls = sorted(
             [s for s in all_u1_surfaces.values() if isinstance(s, openmc.ZCylinder)],
-            key=lambda c: float(c.r)
+            key=lambda c: float(c.r) # type: ignore
         )
         u1_left_bound, _, _, u1_angle_bound = self.element_factory.get_planes()
 

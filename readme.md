@@ -3,7 +3,7 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 
 ## TODO
 
-- [ ] Add all the iterables into the global_vars.py area (such as fuel choice)
+- [x] Add all the iterables into the global_vars.py area (such as fuel choice)
 - [ ] Maybe make an input yaml?
 - [x] Get the ring fully made for the fuel elements.
 - [ ] Add a separate plotter.py file
@@ -15,3 +15,4 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 - [x] Reduce the ratio of r_in to r_out to less than 2.16
 - [x] Actually make three-lobed core
 - [ ] Separate control blades and be distance into two vars.
+- [ ] Explain how the repo actually works
