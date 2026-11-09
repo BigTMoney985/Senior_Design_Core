@@ -81,16 +81,28 @@ class FuelElementGeometry:
 
         for i in range(fuel.plate_num):
             if i == 0:
-                clad_left = +self.element_left_bound & -self.fuel_left & -outer_clad_thickness[-1] & +inner_clad_surfaces[0]
-                clad_right = +inner_clad_surfaces[0] & -outer_clad_thickness[-1] & -self.element_angle & +self.fuel_angle
+                # Let the parent cell clip element_left_bound, element_angle, c_in, and c_out!
+                clad_left = -self.fuel_left
+                clad_right = +self.fuel_angle
 
                 clad_cells.append(openmc.Cell(region=clad_left, fill=materials_dict['aluminum']))
                 clad_cells.append(openmc.Cell(region=clad_right, fill=materials_dict['aluminum']))
-                # This adds the left and right cladding of each fuel element
 
-            clad_inner_region = +inner_clad_surfaces[i] & -inner_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
+            # For the innermost plate (i == 0), don't clip the inside at inner_clad_surfaces[0];
+            # let the parent cell's +c_in clip it so there is no coincident ZCylinder!
+            if i == 0:
+                clad_inner_region = -inner_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
+            else:
+                clad_inner_region = +inner_clad_surfaces[i] & -inner_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
+
             meat_region = +inner_meat_thickness[i] & -outer_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
-            clad_outer_region = +outer_meat_thickness[i] & -outer_clad_thickness[i] & -self.fuel_angle & +self.fuel_left
+
+            # For the outermost plate (i == fuel.plate_num - 1), don't clip the outside at
+            # outer_clad_thickness[-1]; let the parent cell's -c_out clip it!
+            if i == fuel.plate_num - 1:
+                clad_outer_region = +outer_meat_thickness[i] & -self.fuel_angle & +self.fuel_left
+            else:
+                clad_outer_region = +outer_meat_thickness[i] & -outer_clad_thickness[i] & -self.fuel_angle & +self.fuel_left
 
             clad_cells.append(openmc.Cell(region=clad_inner_region, fill=materials_dict['aluminum']))
             fuel_cells.append(openmc.Cell(region=meat_region, fill=materials_dict['fuel']))
