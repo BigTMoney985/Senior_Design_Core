@@ -17,3 +17,4 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 - [ ] Separate control blades and be distance into two vars.
 - [ ] Explain how the repo actually works
 - [x] Make inner blades aluminum and not Be
+- [ ] Implement an argparse for plot or xml creation
