@@ -4,7 +4,7 @@ from geometry.revolver.outer_snake import lobe_3
 from geometry.surrounding_water import WaterGeometry
 from geometry.central_reflector import be_reflector
 
-def create_geometry():
+def create_geometry(withdrawal: float = 0.0) -> openmc.Geometry:
     # 1. Initialize 3-lobe core + lobe control blades + central flux-trap control mechanism
     three_lobe_core = lobe_3()
 
@@ -22,12 +22,15 @@ def create_geometry():
     #   z_lobe_outer = [0.0]*12 (12 outer lobe blades withdrawn)
     #   z_center_inner = -162.5 (central trap inner safety rod withdrawn)
     #   z_center_outer = [0.0]*6 (central trap outer blades withdrawn)
+
+    # withdrawal variable goes from -162.5 to 0.0, where 0.0 is fully withdrawn and -162.5 is fully inserted.
+    #NOTE: if withdrawal is set to zero, you can mess with the withdrawing manually here.
     core_cells = three_lobe_core.build_clover_cells(
         core_outer_cyl=surf_dict['be_in'],
-        z_lobe_inner=-0.0, #-162.5,
-        z_lobe_outer=[-162.5, -162.5,] * 6,
-        z_center_inner=0.0, #-162.5,
-        z_center_outer=[-162.5] * 6,
+        z_lobe_inner=(-162.5 - withdrawal), #-162.5 is out
+        z_lobe_outer=[withdrawal] * 12, # 0 is out
+        z_center_inner=(-162.5 - withdrawal), #-162.5 is out
+        z_center_outer=[withdrawal] * 6, # 0 is out
     )
 
     # 5. Build outer reflector water cells

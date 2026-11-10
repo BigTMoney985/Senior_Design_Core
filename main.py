@@ -19,9 +19,67 @@ gv.user_opts.run_mode = args.run_mode
 gv.user_opts.compute_choice = args.compute_choice
 
 material_dict, materials = create_materials(gv.user_opts.fuel_choice)
-geom = create_geometry()
+
+def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
+    geom = create_geometry(withdrawal=withdrawal)
+    tallies = openmc.Tallies()
+    
+    mesh = openmc.RegularMesh()
+    mesh.dimension = [500, 500]
+    mesh.lower_left = [-20.0, -20.0] #type: ignore
+    mesh.upper_right = [20.0, 20.0] #type: ignore
+    mesh_filter = openmc.MeshFilter(mesh)
+    tally = openmc.Tally(name='mesh tally')
+    tally.filters = [mesh_filter, 
+                     openmc.ParticleFilter(['neutron']), 
+                     openmc.EnergyFilter([0., 1.0, 20.0e6])]
+    tally.scores = ['absorption', 'flux', 'fission']
+    tallies.append(tally)
+
+    # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
+    # fuel_therm_abs_rate.scores = ['absorption']
+    # fuel_therm_abs_rate.filters = [
+    #     openmc.EnergyFilter([0., 0.625]),
+    #     openmc.MaterialFilter([material_dict['fuel']]),
+    #     openmc.ParticleFilter(['neutron'])
+    # ]
+    # tallies.append(fuel_therm_abs_rate)
+    
+    heating_tally = openmc.Tally(name='heating rate')
+    heating_tally.scores = ['heating']
+    tallies.append(heating_tally)
+
+    bounds = [-20, -20, 0, 20, 20, 150]
+    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # type: ignore
+
+    settings = openmc.Settings(
+        run_mode='eigenvalue',
+        particles=int(2e5),
+        batches=125,
+        inactive=15,
+        source=openmc.IndependentSource(space=uniform_dist),
+        #output={'tallies': True},
+        photon_transport = False,
+        max_lost_particles = 50,
+    )
+
+    # REACTOR KINETICS PARAMATERS FINDING ========================
+    #settings.ifp_n_generation = 10
+
+    model = openmc.Model(
+        geometry=geom,
+        materials=materials,
+        settings=settings,
+        tallies=tallies,
+    )
+    #model.add_kinetics_parameters_tallies(num_groups=6)
+    # This is broken right now, dw about it.
+    return model
+
 
 if gv.user_opts.run_mode == 'plot':
+    geom = create_geometry(withdrawal=0.0) # fully withdrawn
+
     plot = openmc.Plot()
     plot.filename = 'plot_1'
     plot.basis = 'xy'
@@ -81,58 +139,7 @@ if gv.user_opts.run_mode == 'plot':
         plt.close()
 
 else:
-    tallies = openmc.Tallies()
-    
-    mesh = openmc.RegularMesh()
-    mesh.dimension = [500, 500]
-    mesh.lower_left = [-20.0, -20.0] #type: ignore
-    mesh.upper_right = [20.0, 20.0] #type: ignore
-    mesh_filter = openmc.MeshFilter(mesh)
-    tally = openmc.Tally(name='mesh tally')
-    tally.filters = [mesh_filter, 
-                     openmc.ParticleFilter(['neutron']), 
-                     openmc.EnergyFilter([0., 1.0, 20.0e6])]
-    tally.scores = ['absorption', 'flux', 'fission']
-    tallies.append(tally)
-
-    # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
-    # fuel_therm_abs_rate.scores = ['absorption']
-    # fuel_therm_abs_rate.filters = [
-    #     openmc.EnergyFilter([0., 0.625]),
-    #     openmc.MaterialFilter([material_dict['fuel']]),
-    #     openmc.ParticleFilter(['neutron'])
-    # ]
-    # tallies.append(fuel_therm_abs_rate)
-    
-    heating_tally = openmc.Tally(name='heating rate')
-    heating_tally.scores = ['heating']
-    tallies.append(heating_tally)
-
-    bounds = [-20, -20, 0, 20, 20, 150]
-    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # type: ignore
-
-    settings = openmc.Settings(
-        run_mode='eigenvalue',
-        particles=int(2e5),
-        batches=125,
-        inactive=15,
-        source=openmc.IndependentSource(space=uniform_dist),
-        #output={'tallies': True},
-        photon_transport = False,
-        max_lost_particles = 50,
-    )
-
-    # REACTOR KINETICS PARAMATERS FINDING ========================
-    #settings.ifp_n_generation = 10
-
-    model = openmc.Model(
-        geometry=geom,
-        materials=materials,
-        settings=settings,
-        tallies=tallies,
-    )
-    #model.add_kinetics_parameters_tallies(num_groups=6)
-    # This is broken right now, dw about it.
+    model = create_run_model(withdrawal=0.0) # fully withdrawn
 
     model.export_to_model_xml()
 
