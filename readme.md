@@ -16,4 +16,4 @@ This is the OpenMC model for team 7 in OpenMC. To change iterable variables, ple
 - [x] Actually make three-lobed core
 - [ ] Separate control blades and be distance into two vars.
 - [ ] Explain how the repo actually works
-- [ ] Make inner blades aluminum and not Be
+- [x] Make inner blades aluminum and not Be
