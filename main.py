@@ -8,6 +8,15 @@ from materials.material_defs import create_materials
 # from geometry.fuel_ring import FuelRingGeometry
 from geometry.model import create_geometry
 import matplotlib.patches as mpatches
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--run-mode', '-r', choices=['plot', 'model'], default='model')
+parser.add_argument('--compute-choice', '-c', choices=['local', 'hpc'], default='hpc')
+args = parser.parse_args()
+
+gv.user_opts.run_mode = args.run_mode
+gv.user_opts.compute_choice = args.compute_choice
 
 material_dict, materials = create_materials(gv.user_opts.fuel_choice)
 geom = create_geometry()

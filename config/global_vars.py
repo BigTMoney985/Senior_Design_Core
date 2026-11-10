@@ -13,8 +13,9 @@ def in_to_cm(inches: float) -> float:
 # ==================== USER OPTIONS ====================
 @dataclass
 class user_opts_class:
-    run_mode: str = 'plot'  # Default run mode is 'plot'
+    run_mode: str = 'model'  # Default run mode is 'plot'
     compute_choice: str = 'hpc' # options: 'local', 'hpc'
+    # Local vs HPC literally just determines if openmc.run() is called after model.export_to_xml()
     legend: bool = True     # Has Materials Legend on the plot
     fuel_choice: str = 'u3si2'  # options: 'u3si2', 'u3o8', 'u10mo'
 user_opts = user_opts_class()
