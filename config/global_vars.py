@@ -52,7 +52,7 @@ class fuel_class:
     temp_var: float = 1.0
     meat_thickness: float = 0.08
     clad_thickness: float = in_to_cm(0.015)
-    nominal_dist: float = 0.08
+    nominal_dist: float = 0.09
     fuel_inner: float = 3.0 # from 4.0
     plate_num: int = 18
     height: float = 150.0

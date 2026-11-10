@@ -27,7 +27,7 @@ class central_blades_cl:
         self.hf = material_dict['hf']
         self.ss304 = material_dict['ss_304']
         self.aluminum = material_dict['aluminum']
-        self.be_metal = material_dict['be_metal']
+        self.be_metal = material_dict['aluminum']
 
         if r_inner_override is None:
             gv.control_blade.rad_in_central = self.r_inner
