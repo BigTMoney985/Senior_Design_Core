@@ -11,7 +11,7 @@ import matplotlib.patches as mpatches
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--run-mode', '-r', choices=['plot', 'model'], default='model')
+parser.add_argument('--run-mode', '-r', choices=['plot', 'model', 'search',], default='model')
 parser.add_argument('--compute-choice', '-c', choices=['local', 'hpc'], default='hpc')
 args = parser.parse_args()
 
@@ -138,7 +138,7 @@ if gv.user_opts.run_mode == 'plot':
         plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
         plt.close()
 
-else:
+elif gv.user_opts.run_mode == 'model':
     model = create_run_model(withdrawal=0.0) # fully withdrawn
 
     model.export_to_model_xml()
@@ -148,6 +148,14 @@ else:
 
     else:
         print("exported model to xml files.")
+
+elif gv.user_opts.run_mode == 'search':
+    # This is a placeholder for the search mode functionality.
+    # You can implement your search logic here.
+    print("Search mode is not yet implemented.")
+
+else:
+    raise ValueError(f"Invalid run mode: {gv.user_opts.run_mode}. Valid options are 'plot', 'model', or 'search'.")
 
 
 
