@@ -98,8 +98,8 @@ def create_materials(mat_choice: str):
     hf_nat.set_density('g/cm3', 13.31)
 
     # hf_steel
-    hf_steel = openmc.Material.mix_materials([hf_nat, ss_304], fracs=[0.01, 0.99], percent_type='wo')
-    hf_steel.set_density('g/cm3', (8.0 * 0.99 + 13.31 * 0.01))
+    hf_steel = openmc.Material.mix_materials([hf_nat, ss_304], fracs=[0.05, 0.95], percent_type='wo')
+    hf_steel.set_density('g/cm3', (8.0 * 0.95 + 13.31 * 0.05))
     hf_steel.name = 'Hafnium control steel'
 
     #b4c = ss_304.clone() # testing ss-304 as a replacement for boron.
