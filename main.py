@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # THIS WILL CONTAIN RUN MODES AND WHATNOT
 import openmc
 from geometry.fuel_element import FuelElementGeometry
