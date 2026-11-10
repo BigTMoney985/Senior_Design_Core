@@ -24,10 +24,10 @@ def create_geometry():
     #   z_center_outer = [0.0]*6 (central trap outer blades withdrawn)
     core_cells = three_lobe_core.build_clover_cells(
         core_outer_cyl=surf_dict['be_in'],
-        z_lobe_inner=-162.5, #-162.5,
-        z_lobe_outer=[0.0, 0.0,] * 6,
-        z_center_inner=-162.5, #-162.5,
-        z_center_outer=[0.0] * 6,
+        z_lobe_inner=0.0, #-162.5,
+        z_lobe_outer=[-162.5, -162.5,] * 6,
+        z_center_inner=-0.0, #-162.5,
+        z_center_outer=[-162.5] * 6,
     )
 
     # 5. Build outer reflector water cells

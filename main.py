@@ -36,7 +36,7 @@ if gv.user_opts.run_mode == 'plot':
         'aluminum': 'lightgray',
         'ss_304': 'darkgray',
         'be_metal': 'maroon',
-        'hf': 'darkgreen',
+        'hf_steel': 'darkgreen',
         'fuel': 'red',
         'water': 'blue',
     }
@@ -95,26 +95,26 @@ else:
     tally.scores = ['absorption', 'flux', 'fission']
     tallies.append(tally)
 
-    fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
-    fuel_therm_abs_rate.scores = ['absorption']
-    fuel_therm_abs_rate.filters = [
-        openmc.EnergyFilter([0., 0.625]),
-        openmc.MaterialFilter([material_dict['fuel']]),
-        openmc.ParticleFilter(['neutron'])
-    ]
-    tallies.append(fuel_therm_abs_rate)
+    # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
+    # fuel_therm_abs_rate.scores = ['absorption']
+    # fuel_therm_abs_rate.filters = [
+    #     openmc.EnergyFilter([0., 0.625]),
+    #     openmc.MaterialFilter([material_dict['fuel']]),
+    #     openmc.ParticleFilter(['neutron'])
+    # ]
+    # tallies.append(fuel_therm_abs_rate)
     
     heating_tally = openmc.Tally(name='heating rate')
     heating_tally.scores = ['heating']
     tallies.append(heating_tally)
 
-    bounds = [-25, -25, 0, 25, 25, 150]
+    bounds = [-20, -20, 0, 20, 20, 150]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # type: ignore
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
         particles=int(2e5),
-        batches=250,
+        batches=125,
         inactive=15,
         source=openmc.IndependentSource(space=uniform_dist),
         #output={'tallies': True},

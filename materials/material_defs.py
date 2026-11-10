@@ -92,10 +92,15 @@ def create_materials(mat_choice: str):
     boron.add_element('B', 1)
     boron.set_density('g/cm3', 2.34)
 
-    # Boron Carbide
-    hf = openmc.Material(name='Hafnium control')
-    hf.add_element('Hf', 1)
-    hf.set_density('g/cm3', 13.31)
+    # hafnium natural
+    hf_nat = openmc.Material(name='Hafnium control')
+    hf_nat.add_element('Hf', 1)
+    hf_nat.set_density('g/cm3', 13.31)
+
+    # hf_steel
+    hf_steel = openmc.Material.mix_materials([hf_nat, ss_304], fracs=[0.01, 0.99], percent_type='wo')
+    hf_steel.set_density('g/cm3', (8.0 * 0.99 + 13.31 * 0.01))
+    hf_steel.name = 'Hafnium control steel'
 
     #b4c = ss_304.clone() # testing ss-304 as a replacement for boron.
 
@@ -143,7 +148,8 @@ def create_materials(mat_choice: str):
         'be_metal': be_metal,
         'graphite': graphite,
         'boron': boron,
-        'hf': hf,
+        'hf_nat': hf_nat,
+        'hf_steel': hf_steel,
         'fuel': fuel,
         'water': water,
         'zr_barrier': zr_barrier,
