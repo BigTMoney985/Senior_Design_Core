@@ -150,10 +150,14 @@ elif gv.user_opts.run_mode == 'model':
         print("exported model to xml files.")
 
 elif gv.user_opts.run_mode == 'search':
-    # This is a placeholder for the search mode functionality.
-    # You can implement your search logic here.
-    print("Search mode is not yet implemented.")
-
+    withdraw_val, guesses, keffs = openmc.search_for_keff(
+        model_builder=create_run_model,
+        target=1.0,
+        bracket=[-162.5, 0.0],
+        tol=1e-2,
+        print_iterations=True,
+        run_args={'mpi_args': ['mpiexec', '-n', '16']} # Assumes hpc
+    )
 else:
     raise ValueError(f"Invalid run mode: {gv.user_opts.run_mode}. Valid options are 'plot', 'model', or 'search'.")
 
