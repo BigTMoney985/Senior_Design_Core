@@ -1,6 +1,8 @@
 # Senior Design reactor core
 This is the OpenMC model for team 7 in OpenMC. To change iterable variables, please go into the global_vars.py file and update any pertinent variables. When you want to get all your xmls (the stuff you use to run the model) please run main.py. If you have any questions, contact tommywilliams@mst.edu or just send me a teams message and I'll try and help out.
 
+The current critical withdrawal point is: -73.0 cm
+
 ## USAGE
 To run the model, simply run ./main.py
 The arguments are as follows:

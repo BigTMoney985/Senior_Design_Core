@@ -156,7 +156,7 @@ elif gv.user_opts.run_mode == 'search':
         bracket=[-162.5, 0.0],
         tol=1e-2,
         print_iterations=True,
-        run_args={'mpi_args': ['mpiexec', '-n', '16']} # Assumes hpc
+        run_args={'mpi_args': ['mpiexec', '-n', '8']} # Assumes hpc
     )
 else:
     raise ValueError(f"Invalid run mode: {gv.user_opts.run_mode}. Valid options are 'plot', 'model', or 'search'.")
