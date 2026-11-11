@@ -45,3 +45,4 @@ t-money@chudlaptop:~/Senior_Design_Core$ ./main.py --run-mode plot
 - [ ] Explain how the repo actually works
 - [x] Make inner blades aluminum and not Be
 - [x] Implement an argparse for plot or xml creation
+- [ ] fix the env variable for chain files n shit...
