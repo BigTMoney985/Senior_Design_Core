@@ -4,8 +4,12 @@
 *.pyd
 *.xml
 *.png
+<<<<<<< HEAD
 materials.xml
 *.h5
 *.out
 etc.ipynb
 .vscode/
+=======
+/transport_cask/poopy_butt/*
+>>>>>>> 2082fa6 (Added treat to repo and cask)
