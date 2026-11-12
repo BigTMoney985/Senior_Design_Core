@@ -26,7 +26,7 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     
     mesh = openmc.RegularMesh()
     mesh.dimension = [500, 500]
-    mesh.lower_left = [-20.0, -20.0] #type: ignore
+    mesh.lower_left = [-18.0, -18.0] #type: ignore
     mesh.upper_right = [20.0, 20.0] #type: ignore
     mesh_filter = openmc.MeshFilter(mesh)
     tally = openmc.Tally(name='mesh tally')
@@ -34,7 +34,17 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
                      openmc.ParticleFilter(['neutron']), 
                      openmc.EnergyFilter([0., 1.0, 20.0e6])]
     tally.scores = ['absorption', 'flux', 'fission']
-    tallies.append(tally)
+    # tallies.append(tally)
+
+    three_d_mesh = openmc.RegularMesh()
+    three_d_mesh.dimension = [500, 500, 600]
+    three_d_mesh.lower_left = [-18.0, -18.0, 0.0] #type: ignore
+    three_d_mesh.upper_right = [18.0, 18.0, 150.0] #type: ignore
+    three_d_mesh_filter = openmc.MeshFilter(three_d_mesh)
+    heating_tally_3d = openmc.Tally(name='3D heating tally')
+    heating_tally_3d.filters = [three_d_mesh_filter]
+    heating_tally_3d.scores = ['heating']
+    tallies.append(heating_tally_3d)
 
     # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
     # fuel_therm_abs_rate.scores = ['absorption']
@@ -45,22 +55,22 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     # ]
     # tallies.append(fuel_therm_abs_rate)
     
-    heating_tally = openmc.Tally(name='heating rate')
-    heating_tally.scores = ['heating']
-    tallies.append(heating_tally)
+    # heating_tally = openmc.Tally(name='heating rate')
+    # heating_tally.scores = ['heating']
+    # tallies.append(heating_tally)
 
     bounds = [-20, -20, 0, 20, 20, 150]
-    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:], only_fissionable=True) # type: ignore
+    uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:]) # type: ignore
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
         particles=int(2e5),
         batches=125,
         inactive=15,
-        source=openmc.IndependentSource(space=uniform_dist),
+        source=openmc.IndependentSource(space=uniform_dist, constraints={'fissionable': True}),
         #output={'tallies': True},
-        photon_transport = False,
-        max_lost_particles = 50,
+        photon_transport = True,
+        #max_lost_particles = 50,
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
