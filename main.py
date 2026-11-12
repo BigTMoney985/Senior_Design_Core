@@ -67,13 +67,13 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
-        particles=int(2e5),
-        batches=125,
+        particles=int(4e5),
+        batches=400,
         inactive=15,
         source=openmc.IndependentSource(space=uniform_dist, constraints={'fissionable': True}),
         #output={'tallies': True},
         photon_transport = True,
-        #max_lost_particles = 50,
+        max_lost_particles = 100,
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
@@ -152,7 +152,7 @@ if gv.user_opts.run_mode == 'plot':
         plt.close()
 
 elif gv.user_opts.run_mode == 'model':
-    model = create_run_model(withdrawal=0.0) # fully withdrawn is 0.0
+    model = create_run_model(withdrawal=-80.0) # fully withdrawn is 0.0, fully inserted is -162.5
 
     model.export_to_model_xml()
 
