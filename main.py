@@ -9,6 +9,7 @@ from materials.material_defs import create_materials
 from geometry.model import create_geometry
 import matplotlib.patches as mpatches
 import argparse
+import math
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--run-mode', '-r', choices=['plot', 'model', 'search',], default='model')
@@ -66,9 +67,9 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:]) # type: ignore
 
     entropy_mesh = openmc.RegularMesh()
-    entropy_mesh.dimension = [10, 10, 15]
-    entropy_mesh.lower_left = [-20, -20, 0] # type: ignore
-    entropy_mesh.upper_right = [20, 20, 150] # type: ignore
+    #entropy_mesh.dimension = [10, 10, 15]
+    #entropy_mesh.lower_left = [-20, -20, 0] # type: ignore
+    #entropy_mesh.upper_right = [20, 20, 150] # type: ignore
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
@@ -78,9 +79,16 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
         source=openmc.IndependentSource(space=uniform_dist, constraints={'fissionable': True}),
         #output={'tallies': True},
         photon_transport = True,
-        entropy_mesh = entropy_mesh,
         max_lost_particles = 400,
     )
+
+    n = math.ceil((settings.particles / 20.0)**(1.0 / 3.0))
+    entropy_mesh = openmc.RegularMesh()
+    entropy_mesh.dimension = [n, n, n]
+    entropy_mesh.lower_left = [-20, -20, 0] # type: ignore
+    entropy_mesh.upper_right = [20, 20, 150] # type: ignore
+
+    settings.entropy_mesh = entropy_mesh
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
     #settings.ifp_n_generation = 10
