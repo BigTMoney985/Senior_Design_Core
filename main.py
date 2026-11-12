@@ -65,15 +65,21 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     bounds = [-20, -20, 0, 20, 20, 150]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:]) # type: ignore
 
+    entropy_mesh = openmc.RegularMesh()
+    entropy_mesh.dimension = [10, 10, 15]
+    entropy_mesh.lower_left = [-20, -20, 0] # type: ignore
+    entropy_mesh.upper_right = [20, 20, 150] # type: ignore
+
     settings = openmc.Settings(
         run_mode='eigenvalue',
-        particles=int(4e5),
+        particles=int(3e5),
         batches=400,
-        inactive=15,
+        inactive=30,
         source=openmc.IndependentSource(space=uniform_dist, constraints={'fissionable': True}),
         #output={'tallies': True},
         photon_transport = True,
-        max_lost_particles = 100,
+        entropy_mesh = entropy_mesh,
+        max_lost_particles = 400,
     )
 
     # REACTOR KINETICS PARAMATERS FINDING ========================
