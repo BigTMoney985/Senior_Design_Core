@@ -78,13 +78,13 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
 
 
 if gv.user_opts.run_mode == 'plot':
-    geom = create_geometry(withdrawal=0.0) # fully withdrawn
+    geom = create_geometry(withdrawal=-73.0) # fully withdrawn at 0.0
 
     plot = openmc.Plot()
     plot.filename = 'plot_1'
-    plot.basis = 'xy'
+    plot.basis = 'xz'
     plot.origin = (0, 0, 75)
-    plot.width = (40, 40)
+    plot.width = (40, 160)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
     plot.show_overlaps = True
@@ -118,14 +118,14 @@ if gv.user_opts.run_mode == 'plot':
     if gv.user_opts.legend:
         img = plt.imread(f'{plot.filename}.png')
 
-        extent = [-20.0, 20.0, -20.0, 20.0]
+        #extent = [-20.0, 20.0, -20.0, 20.0]
 
         fig, ax = plt.subplots(figsize=(10, 8))
-        ax.imshow(img, extent=extent, origin='upper') # type: ignore
-        ax.set_xticks(range(-20, 21, 5))
-        ax.set_yticks(range(-20, 21, 5))
+        ax.imshow(img, origin='upper') # type: ignore
+        #ax.set_xticks(range(-20, 21, 10))
+        #ax.set_yticks(range(-5, 156, 20))
         ax.set_xlabel("x [cm]")
-        ax.set_ylabel("y [cm]")
+        ax.set_ylabel("z [cm]")
         ax.tick_params(axis='both', which='both', direction='out', length=5)
 
         patches = [
@@ -139,7 +139,7 @@ if gv.user_opts.run_mode == 'plot':
         plt.close()
 
 elif gv.user_opts.run_mode == 'model':
-    model = create_run_model(withdrawal=0.0) # fully withdrawn
+    model = create_run_model(withdrawal=0.0) # fully withdrawn is 0.0
 
     model.export_to_model_xml()
 
