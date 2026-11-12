@@ -13,6 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--run-mode', '-r', choices=['plot', 'model', 'search',], default='model')
 parser.add_argument('--compute-choice', '-c', choices=['local', 'hpc'], default='hpc')
+parser.add_argument('--no-tally', action='store_true', help='Disable tallies in the model')
 args = parser.parse_args()
 
 gv.user_opts.run_mode = args.run_mode
@@ -22,42 +23,44 @@ material_dict, materials = create_materials(gv.user_opts.fuel_choice)
 
 def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     geom = create_geometry(withdrawal=withdrawal)
+
     tallies = openmc.Tallies()
-    
-    mesh = openmc.RegularMesh()
-    mesh.dimension = [500, 500]
-    mesh.lower_left = [-18.0, -18.0] #type: ignore
-    mesh.upper_right = [20.0, 20.0] #type: ignore
-    mesh_filter = openmc.MeshFilter(mesh)
-    tally = openmc.Tally(name='mesh tally')
-    tally.filters = [mesh_filter, 
-                     openmc.ParticleFilter(['neutron']), 
-                     openmc.EnergyFilter([0., 1.0, 20.0e6])]
-    tally.scores = ['absorption', 'flux', 'fission']
-    # tallies.append(tally)
+    if not args.no_tally:
+        
+        mesh = openmc.RegularMesh()
+        mesh.dimension = [500, 500]
+        mesh.lower_left = [-18.0, -18.0] #type: ignore
+        mesh.upper_right = [20.0, 20.0] #type: ignore
+        mesh_filter = openmc.MeshFilter(mesh)
+        tally = openmc.Tally(name='mesh tally')
+        tally.filters = [mesh_filter, 
+                        openmc.ParticleFilter(['neutron']), 
+                        openmc.EnergyFilter([0., 1.0, 20.0e6])]
+        tally.scores = ['absorption', 'flux', 'fission']
+        # tallies.append(tally)
 
-    three_d_mesh = openmc.RegularMesh()
-    three_d_mesh.dimension = [500, 500, 600]
-    three_d_mesh.lower_left = [-18.0, -18.0, 0.0] #type: ignore
-    three_d_mesh.upper_right = [18.0, 18.0, 150.0] #type: ignore
-    three_d_mesh_filter = openmc.MeshFilter(three_d_mesh)
-    heating_tally_3d = openmc.Tally(name='3D heating tally')
-    heating_tally_3d.filters = [three_d_mesh_filter]
-    heating_tally_3d.scores = ['heating']
-    tallies.append(heating_tally_3d)
+        three_d_mesh = openmc.RegularMesh()
+        three_d_mesh.dimension = [500, 500, 600]
+        three_d_mesh.lower_left = [-18.0, -18.0, 0.0] #type: ignore
+        three_d_mesh.upper_right = [18.0, 18.0, 150.0] #type: ignore
+        three_d_mesh_filter = openmc.MeshFilter(three_d_mesh)
+        heating_tally_3d = openmc.Tally(name='3D heating tally')
+        heating_tally_3d.filters = [three_d_mesh_filter]
+        heating_tally_3d.scores = ['heating']
+        tallies.append(heating_tally_3d)
 
-    # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
-    # fuel_therm_abs_rate.scores = ['absorption']
-    # fuel_therm_abs_rate.filters = [
-    #     openmc.EnergyFilter([0., 0.625]),
-    #     openmc.MaterialFilter([material_dict['fuel']]),
-    #     openmc.ParticleFilter(['neutron'])
-    # ]
-    # tallies.append(fuel_therm_abs_rate)
-    
-    # heating_tally = openmc.Tally(name='heating rate')
-    # heating_tally.scores = ['heating']
-    # tallies.append(heating_tally)
+        # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
+        # fuel_therm_abs_rate.scores = ['absorption']
+        # fuel_therm_abs_rate.filters = [
+        #     openmc.EnergyFilter([0., 0.625]),
+        #     openmc.MaterialFilter([material_dict['fuel']]),
+        #     openmc.ParticleFilter(['neutron'])
+        # ]
+        # tallies.append(fuel_therm_abs_rate)
+        
+        # heating_tally = openmc.Tally(name='heating rate')
+        # heating_tally.scores = ['heating']
+        # tallies.append(heating_tally)
 
     bounds = [-20, -20, 0, 20, 20, 150]
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:]) # type: ignore

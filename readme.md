@@ -17,6 +17,9 @@ This will determine if openmc.run() is called after running the model option. If
 the model will not be ran immediately and you will have to do either a mpiexec command or run openmc in 
 the terminal. Using 'local' will call openmc.run() immediately following the generation of the model.xml file.
 
+--no-tally
+Disables all tally gathering and only gets keff values. Can increase performance.
+
 EXAMPLE USAGE:
 ```console
 t-money@chudlaptop:~/Senior_Design_Core$ ./main.py --run-mode model -c local
