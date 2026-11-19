@@ -170,7 +170,7 @@ if gv.user_opts.run_mode == 'plot':
 # WITHDRAWAL SETTINGS FOR MAIN MODEL RUN
 # ================================================
 elif gv.user_opts.run_mode == 'model':
-    model = create_run_model(withdrawal=-162.5) # fully withdrawn is 0.0, fully inserted is -162.5
+    model = create_run_model(withdrawal=-82.0) # fully withdrawn is 0.0, fully inserted is -162.5
 
     model.export_to_model_xml()
 

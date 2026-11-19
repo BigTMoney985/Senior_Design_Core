@@ -30,7 +30,7 @@ def create_geometry(withdrawal: float = 0.0) -> openmc.Geometry:
         core_outer_cyl=surf_dict['be_in'],
         z_lobe_inner=(-162.5 - withdrawal), #-162.5 is out
         z_lobe_outer=[withdrawal] * 12, # 0 is out
-        z_center_inner=(-162.5), #-162.5 is out
+        z_center_inner=(-162.5 - withdrawal), #-162.5 is out
         z_center_outer=[withdrawal] * 6, # 0 is out
     )
 
