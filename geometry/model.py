@@ -41,7 +41,7 @@ def create_geometry(withdrawal: float = 0.0) -> openmc.Geometry:
     intermediate_universe = openmc.Universe(cells=core_cells + [be_cell] + outer_water_cells)
     
     # 7. 60 degree wedge for variance reduction
-    if not root_universe:
+    if not "root_universe" in locals():
         alpha = np.radians(60.0)
         vert_wedge = openmc.XPlane(x0=0.0, boundary_type='reflective')
         angle_wedge = openmc.Plane(b=-np.sin(alpha), a=(round(np.cos(alpha),6)), c=0.0, d=0.0, boundary_type='reflective')
