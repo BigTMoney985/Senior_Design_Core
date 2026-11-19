@@ -1,4 +1,5 @@
 import openmc 
+import numpy as np
 import config.global_vars as gv
 from geometry.revolver.outer_snake import lobe_3
 from geometry.surrounding_water import WaterGeometry
@@ -36,8 +37,18 @@ def create_geometry(withdrawal: float = 0.0) -> openmc.Geometry:
     # 5. Build outer reflector water cells
     outer_water_cells = water_geom.create_water_cells_around(surf_dict)
 
-    # 6. Assemble root universe
-    root_universe = openmc.Universe(cells=core_cells + [be_cell] + outer_water_cells)
+    # 6. Assemble intermediate universe
+    intermediate_universe = openmc.Universe(cells=core_cells + [be_cell] + outer_water_cells)
+    
+    # 7. 60 degree wedge for variance reduction
+    alpha = np.radians(60.0)
+    vert_wedge = openmc.XPlane(x0=0.0, boundary_type='reflective')
+    angle_wedge = openmc.Plane(b=-np.sin(alpha), a=(round(np.cos(alpha),6)), c=0.0, d=0.0, boundary_type='reflective')
+    slice_cell = openmc.Cell(
+        region = +vert_wedge & -angle_wedge,
+        fill = intermediate_universe,
+    )
+    root_universe = openmc.Universe(cells=[slice_cell])
     root_geometry = openmc.Geometry(root=root_universe)
-
+    
     return root_geometry
