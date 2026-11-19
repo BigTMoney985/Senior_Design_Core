@@ -33,22 +33,22 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
         mesh.lower_left = [-18.0, -18.0] #type: ignore
         mesh.upper_right = [20.0, 20.0] #type: ignore
         mesh_filter = openmc.MeshFilter(mesh)
-        tally = openmc.Tally(name='mesh tally')
-        tally.filters = [mesh_filter, 
-                        openmc.ParticleFilter(['neutron']), 
-                        openmc.EnergyFilter([0., 1.0, 20.0e6])]
-        tally.scores = ['absorption', 'flux', 'fission']
+        # tally = openmc.Tally(name='mesh tally')
+        # tally.filters = [mesh_filter, 
+        #                 openmc.ParticleFilter(['neutron']), 
+        #                 openmc.EnergyFilter([0., 1.0, 20.0e6])]
+        # tally.scores = ['absorption', 'flux', 'fission']
         # tallies.append(tally)
 
-        three_d_mesh = openmc.RegularMesh()
-        three_d_mesh.dimension = [500, 500, 600]
-        three_d_mesh.lower_left = [-18.0, -18.0, 0.0] #type: ignore
-        three_d_mesh.upper_right = [18.0, 18.0, 150.0] #type: ignore
-        three_d_mesh_filter = openmc.MeshFilter(three_d_mesh)
-        heating_tally_3d = openmc.Tally(name='3D heating tally')
-        heating_tally_3d.filters = [three_d_mesh_filter]
-        heating_tally_3d.scores = ['heating']
-        tallies.append(heating_tally_3d)
+        # three_d_mesh = openmc.RegularMesh()
+        # three_d_mesh.dimension = [500, 500, 600]
+        # three_d_mesh.lower_left = [-18.0, -18.0, 0.0] #type: ignore
+        # three_d_mesh.upper_right = [18.0, 18.0, 150.0] #type: ignore
+        # three_d_mesh_filter = openmc.MeshFilter(three_d_mesh)
+        # heating_tally_3d = openmc.Tally(name='3D heating tally')
+        # heating_tally_3d.filters = [three_d_mesh_filter]
+        # heating_tally_3d.scores = ['heating']
+        # tallies.append(heating_tally_3d)
 
         # fuel_therm_abs_rate = openmc.Tally(name='fuel therm. abs. rate')
         # fuel_therm_abs_rate.scores = ['absorption']
@@ -63,7 +63,8 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
         # heating_tally.scores = ['heating']
         # tallies.append(heating_tally)
 
-    bounds = [-20, -20, 0, 20, 20, 150]
+    #bounds = [-20, -20, 0, 20, 20, 150] # for regular unwedged model
+    bounds = [0, 0, 0, 20, 20, 150] # for wedged model
     uniform_dist = openmc.stats.Box(bounds[:3], bounds[3:]) # type: ignore
 
     entropy_mesh = openmc.RegularMesh()
@@ -73,19 +74,19 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
-        particles=int(3e5),
-        batches=400,
+        particles=int(2e4),
+        batches=200,
         inactive=30,
         source=openmc.IndependentSource(space=uniform_dist, constraints={'fissionable': True}),
         #output={'tallies': True},
-        photon_transport = True,
+        photon_transport = False,
         max_lost_particles = 400,
     )
 
     n = math.ceil((settings.particles / 20.0)**(1.0 / 3.0))
     entropy_mesh = openmc.RegularMesh()
     entropy_mesh.dimension = [n, n, n]
-    entropy_mesh.lower_left = [-20, -20, 0] # type: ignore
+    entropy_mesh.lower_left = [0, 0, 0] # type: ignore
     entropy_mesh.upper_right = [20, 20, 150] # type: ignore
 
     settings.entropy_mesh = entropy_mesh
@@ -109,9 +110,9 @@ if gv.user_opts.run_mode == 'plot':
 
     plot = openmc.Plot()
     plot.filename = 'plot_1'
-    plot.basis = 'xz'
+    plot.basis = 'xy'
     plot.origin = (0, 0, 75)
-    plot.width = (40, 160)
+    plot.width = (40, 40)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
     plot.show_overlaps = True
@@ -145,14 +146,14 @@ if gv.user_opts.run_mode == 'plot':
     if gv.user_opts.legend:
         img = plt.imread(f'{plot.filename}.png')
 
-        #extent = [-20.0, 20.0, -20.0, 20.0]
+        extent = [-20.0, 20.0, -20.0, 20.0]
 
         fig, ax = plt.subplots(figsize=(10, 8))
-        ax.imshow(img, origin='upper') # type: ignore
-        #ax.set_xticks(range(-20, 21, 10))
-        #ax.set_yticks(range(-5, 156, 20))
+        ax.imshow(img, origin='upper', extent=extent) # type: ignore
+        ax.set_xticks(range(-20, 21, 5))
+        ax.set_yticks(range(-20, 21, 5))
         ax.set_xlabel("x [cm]")
-        ax.set_ylabel("z [cm]")
+        ax.set_ylabel("y [cm]")
         ax.tick_params(axis='both', which='both', direction='out', length=5)
 
         patches = [
@@ -166,7 +167,7 @@ if gv.user_opts.run_mode == 'plot':
         plt.close()
 
 elif gv.user_opts.run_mode == 'model':
-    model = create_run_model(withdrawal=-80.0) # fully withdrawn is 0.0, fully inserted is -162.5
+    model = create_run_model(withdrawal=0.0) # fully withdrawn is 0.0, fully inserted is -162.5
 
     model.export_to_model_xml()
 
@@ -179,6 +180,7 @@ elif gv.user_opts.run_mode == 'model':
 elif gv.user_opts.run_mode == 'search':
     withdraw_val, guesses, keffs = openmc.search_for_keff(
         model_builder=create_run_model,
+        initial_guess=-80.0,
         target=1.0,
         bracket=[-162.5, 0.0],
         tol=1e-2,
