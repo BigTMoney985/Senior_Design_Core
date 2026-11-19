@@ -9,3 +9,4 @@ materials.xml
 *.out
 etc.ipynb
 .vscode/
+*.vtk
