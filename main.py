@@ -10,6 +10,7 @@ from geometry.model import create_geometry
 import matplotlib.patches as mpatches
 import argparse
 import math
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--run-mode', '-r', choices=['plot', 'model', 'search',], default='model')
@@ -28,17 +29,43 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     tallies = openmc.Tallies()
     if not args.no_tally:
         
-        mesh = openmc.RegularMesh()
-        mesh.dimension = [200, 200, 1]
-        mesh.lower_left = [0.0, 0.0, 70.0] #type: ignore
-        mesh.upper_right = [20.0, 20.0, 80.0] #type: ignore
-        mesh_filter = openmc.MeshFilter(mesh)
-        tally = openmc.Tally(name='mesh tally')
-        tally.filters = [mesh_filter, 
-                        openmc.ParticleFilter(['neutron']), 
-                        openmc.EnergyFilter([0., 1.0, 20.0e6])]
-        tally.scores = ['absorption', 'flux', 'fission']
-        tallies.append(tally)
+        # ==================================
+        # Full core flux tally
+        # ==================================
+        
+        # mesh = openmc.RegularMesh()
+        # mesh.dimension = [200, 200, 1]
+        # mesh.lower_left = [0.0, 0.0, 70.0] #type: ignore
+        # mesh.upper_right = [20.0, 20.0, 80.0] #type: ignore
+        # mesh_filter = openmc.MeshFilter(mesh)
+        # tally = openmc.Tally(name='mesh tally')
+        # tally.filters = [mesh_filter, 
+        #                 openmc.ParticleFilter(['neutron']), 
+        #                 openmc.EnergyFilter([0., 1.0, 20.0e6])]
+        # tally.scores = ['absorption', 'flux', 'fission']
+        # tallies.append(tally)
+
+        # ==================================
+        #Wedge flux tally
+        # ==================================
+        r_grid = np.linspace(0.0, 20.0, 150)          # 150 radial bins (cm)
+        phi_grid = np.linspace(0.0, np.pi / 3.0, 120)  # 120 azimuthal bins across a 60 deg wedge
+        cyl_mesh = openmc.CylindricalMesh(
+            r_grid=r_grid,
+            phi_grid=phi_grid,
+            z_grid=np.array([70.0, 80.0]),
+            origin=(0.0, 0.0, 70.0),
+        )
+        
+        evil_ass_tally = openmc.Tally(
+            name="Cylindrical Flux",
+            filter=[openmc.MeshFilter(cyl_mesh), openmc.ParticleFilter(['neutron']), openmc.EnergyFilter([0., 1.0, 20.0e6])],
+        )
+        evil_ass_tally.scores = ["flux"]
+        tallies.append(evil_ass_tally)
+        # ==================================
+        # Full core heating tally
+        # ==================================
 
         # three_d_mesh = openmc.RegularMesh()
         # three_d_mesh.dimension = [500, 500, 600]
