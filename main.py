@@ -29,16 +29,16 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     if not args.no_tally:
         
         mesh = openmc.RegularMesh()
-        mesh.dimension = [500, 500]
-        mesh.lower_left = [-18.0, -18.0] #type: ignore
-        mesh.upper_right = [20.0, 20.0] #type: ignore
+        mesh.dimension = [200, 200, 1]
+        mesh.lower_left = [0.0, 0.0, 70.0] #type: ignore
+        mesh.upper_right = [20.0, 20.0, 80.0] #type: ignore
         mesh_filter = openmc.MeshFilter(mesh)
-        # tally = openmc.Tally(name='mesh tally')
-        # tally.filters = [mesh_filter, 
-        #                 openmc.ParticleFilter(['neutron']), 
-        #                 openmc.EnergyFilter([0., 1.0, 20.0e6])]
-        # tally.scores = ['absorption', 'flux', 'fission']
-        # tallies.append(tally)
+        tally = openmc.Tally(name='mesh tally')
+        tally.filters = [mesh_filter, 
+                        openmc.ParticleFilter(['neutron']), 
+                        openmc.EnergyFilter([0., 1.0, 20.0e6])]
+        tally.scores = ['absorption', 'flux', 'fission']
+        tallies.append(tally)
 
         # three_d_mesh = openmc.RegularMesh()
         # three_d_mesh.dimension = [500, 500, 600]
@@ -59,9 +59,9 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
         # ]
         # tallies.append(fuel_therm_abs_rate)
         
-        # heating_tally = openmc.Tally(name='heating rate')
-        # heating_tally.scores = ['heating']
-        # tallies.append(heating_tally)
+        heating_tally = openmc.Tally(name='heating rate')
+        heating_tally.scores = ['heating']
+        tallies.append(heating_tally)
 
     #bounds = [-20, -20, 0, 20, 20, 150] # for regular unwedged model
     bounds = [0, 0, 0, 20, 20, 150] # for wedged model
@@ -74,12 +74,12 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
 
     settings = openmc.Settings(
         run_mode='eigenvalue',
-        particles=int(2e4),
+        particles=int(3e4),
         batches=200,
         inactive=30,
         source=openmc.IndependentSource(space=uniform_dist, constraints={'fissionable': True}),
         #output={'tallies': True},
-        photon_transport = False,
+        photon_transport = True,
         max_lost_particles = 400,
     )
 
@@ -111,8 +111,8 @@ if gv.user_opts.run_mode == 'plot':
     plot = openmc.Plot()
     plot.filename = 'plot_1'
     plot.basis = 'xy'
-    plot.origin = (0, 0, 75)
-    plot.width = (40, 40)
+    plot.origin = (14.5, 8, 75) # plot.origin = (0, 0, 75)
+    plot.width = (10, 10) # plot.width = (40, 40)
     plot.pixels = (2160, 2160)
     plot.color_by = 'material'
     plot.show_overlaps = True
@@ -166,8 +166,11 @@ if gv.user_opts.run_mode == 'plot':
         plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
         plt.close()
 
+# ================================================
+# WITHDRAWAL SETTINGS FOR MAIN MODEL RUN
+# ================================================
 elif gv.user_opts.run_mode == 'model':
-    model = create_run_model(withdrawal=0.0) # fully withdrawn is 0.0, fully inserted is -162.5
+    model = create_run_model(withdrawal=-162.5) # fully withdrawn is 0.0, fully inserted is -162.5
 
     model.export_to_model_xml()
 
