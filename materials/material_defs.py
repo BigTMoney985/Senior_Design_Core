@@ -118,6 +118,7 @@ def create_materials(mat_choice: str):
         fuel.name = 'U3Si2-Al'
         fuel.temperature = 600.0 # pyright: ignore[reportAttributeAccessIssue]
         fuel.depletable = True
+        fuel.volume = (gv.fuel.meat_vol * 1e6 / 6) # type: ignore # 1e6 is changing it to cm3. Type: Ignore
         #fuel.add_s_alpha_beta('c_Al27')
 
     elif mat_choice.lower() == 'u3o8':

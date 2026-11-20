@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # THIS WILL CONTAIN RUN MODES AND WHATNOT
 import openmc
-from geometry.fuel_element import FuelElementGeometry
+import openmc.deplete
 from matplotlib import pyplot as plt
 from config import global_vars as gv
 from materials.material_defs import create_materials
-# from geometry.fuel_ring import FuelRingGeometry
 from tallies.tally_gen import tally_generator
 from geometry.model import create_geometry
 import matplotlib.patches as mpatches
@@ -13,7 +12,7 @@ import argparse
 import math
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--run-mode', '-r', choices=['plot', 'model', 'search',], default='model')
+parser.add_argument('--run-mode', '-r', choices=['plot', 'model', 'search', 'deplete'], default='model')
 parser.add_argument('--compute-choice', '-c', choices=['local', 'hpc'], default='hpc')
 parser.add_argument('--no-tally', action='store_true', help='Disable tallies in the model')
 args = parser.parse_args()
@@ -68,10 +67,58 @@ def create_run_model(withdrawal: float = 0.0) -> openmc.Model:
     )
     #model.add_kinetics_parameters_tallies(num_groups=6)
     # This is broken right now, dw about it.
+
     return model
 
+# ================================================
+# WITHDRAWAL SETTINGS FOR MAIN MODEL RUN
+# ================================================
+if gv.user_opts.run_mode == 'model':
+    model = create_run_model(withdrawal=-82.0) # fully withdrawn is 0.0, fully inserted is -162.5
 
-if gv.user_opts.run_mode == 'plot':
+    
+
+    model.export_to_model_xml()
+
+    if gv.user_opts.compute_choice == 'local':
+        model.run()
+
+    else:
+        print("exported model to xml files.")
+
+
+elif gv.user_opts.run_mode == 'deplete':
+    model = create_run_model(withdrawal=-82.0) # fully withdrawn is 0.0, fully inserted is -162.5
+
+    # ===========================================
+    # DEPLETION SETTINGS
+    # ===========================================
+    fission_q = {"U235": 202e+6}  # energy in eV
+    power = (50.0e6 / 6) #MW after model is sliced.
+    timesteps = [1, 1, 1, 1, 1, 1] # Days
+    op = openmc.deplete.CoupledOperator(
+        model,
+        "chain.xml",
+        fission_q=fission_q,
+        diff_burnable_mats=True,
+    )
+
+    integrator = openmc.deplete.CECMIntegrator(op, timesteps, power, timestep_units='d')
+    integrator.integrate()
+
+
+elif gv.user_opts.run_mode == 'search':
+    withdraw_val, guesses, keffs = openmc.search_for_keff(
+        model_builder=create_run_model,
+        initial_guess=-80.0,
+        target=1.0,
+        bracket=[-162.5, 0.0],
+        tol=1e-2,
+        print_iterations=True,
+        run_args={'mpi_args': ['mpiexec', '-n', '8']} # Assumes hpc
+    )
+
+elif gv.user_opts.run_mode == 'plot':
     geom = create_geometry(withdrawal=-73.0) # fully withdrawn at 0.0
 
     plot = openmc.Plot()
@@ -132,30 +179,6 @@ if gv.user_opts.run_mode == 'plot':
         plt.savefig('slice_plot_with_legend.png', bbox_inches='tight', dpi=300)
         plt.close()
 
-# ================================================
-# WITHDRAWAL SETTINGS FOR MAIN MODEL RUN
-# ================================================
-elif gv.user_opts.run_mode == 'model':
-    model = create_run_model(withdrawal=-82.0) # fully withdrawn is 0.0, fully inserted is -162.5
-
-    model.export_to_model_xml()
-
-    if gv.user_opts.compute_choice == 'local':
-        model.run()
-
-    else:
-        print("exported model to xml files.")
-
-elif gv.user_opts.run_mode == 'search':
-    withdraw_val, guesses, keffs = openmc.search_for_keff(
-        model_builder=create_run_model,
-        initial_guess=-80.0,
-        target=1.0,
-        bracket=[-162.5, 0.0],
-        tol=1e-2,
-        print_iterations=True,
-        run_args={'mpi_args': ['mpiexec', '-n', '8']} # Assumes hpc
-    )
 else:
     raise ValueError(f"Invalid run mode: {gv.user_opts.run_mode}. Valid options are 'plot', 'model', or 'search'.")
 

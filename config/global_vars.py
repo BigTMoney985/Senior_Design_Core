@@ -56,6 +56,7 @@ class fuel_class:
     fuel_inner: float = 3.0 # from 4.0
     plate_num: int = 18
     height: float = 150.0
+    meat_vol: float = (0.001482322 * 24) # Number calculated from Matt W's Excel, 24 is number of fuel elements, value is in m3
 
     # Updated dynamically when FuelElementGeometry.define_plates() runs (~8.3416 cm)
     fuel_outer: float = 8.3416
